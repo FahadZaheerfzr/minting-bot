@@ -5,7 +5,7 @@ from components.start import start #import the start function from the start.py 
 mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object with the bot token we have
 
 #message handlers
-mint_bot.register_message_handler(start, pass_bot=True, func= lambda message: len(message.text.split("/start "))==2) #register the start function to the /start command we are passing the bot object and a function to check if the message is /start <something>
+mint_bot.register_message_handler(start, pass_bot=True, commands=["start"]) #register the start function to the /start command we are passing the bot object and a function to check if the message is a command
 
 
 
