@@ -1,4 +1,5 @@
 from config import BOT_TOKEN 
+import web3
 import telebot # pip install pyTelegramBotAPI
 from components.start import start #import the start function from the start.py file
 
