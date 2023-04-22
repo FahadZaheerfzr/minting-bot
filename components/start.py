@@ -15,12 +15,7 @@ def start(message, bot):
 
     response = response.json()
     #here we will get the token info
-    tokenInfo = getTokenInfo(NFT_TOKEN_ADDRESS)
-    #return token info allowed, max supply and token uri
-    #get image from token uri
-    #send the image with the token info
-    
-    image = requests.get(tokenInfo['tokenURI']).json()['image']
+
 
     #get hashes of all transactions
     hashes = []
@@ -37,6 +32,23 @@ def start(message, bot):
     for i in range(len(response['result'])):
         hashes.append(response['result'][i]['hash'])
         
+    #to get the token ids
+    tokenIDs = []
+    for i in range(len(froms)):
+        transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={NFT_TOKEN_ADDRESS}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
+        transactions = transactions.json()
+        if transactions['result']:  # check if 'result' is not empty
+            for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):
+                tokenIDs.append(tx['tokenID'])
+
+    latestMint = int(tokenIDs[0])
+    tokenInfo = getTokenInfo(NFT_TOKEN_ADDRESS, latestMint)
+    #return token info allowed, max supply and token uri
+    #get image from token uri
+    #send the image with the token info
+    image = requests.get(tokenInfo['tokenURI']).json()['image']
+    maxSupply = tokenInfo['maxSupply']
+    totalSupply = tokenInfo['totalSupply']
 
     # Create the "Mint here!" button
     mint_btn = types.InlineKeyboardButton("Mint here!", callback_data="mint")
@@ -45,10 +57,10 @@ def start(message, bot):
     markup = types.InlineKeyboardMarkup().add(mint_btn)
 
     # Create the formatted message
-    caption = """
+    caption = f"""
 🟩 <b>SSSS #130</b> has been minted \n
 <code>Minter</code> : <a href="https://t.me/alexnotzank.bnb">@alexnotzank.bnb</a>\n
-<code>NFTs left</code>: <b>3290 / 3420</b>\n
+<code>NFTs left</code>: <b>{-totalSupply+maxSupply} / {maxSupply}</b>\n
 <code>Timestamp</code>: Apr-20-2023 06:55:55 PM +UTC\n
 <b>Traits:</b>\n
 <code>state</code>:       <b>unrevealed</b>\n
