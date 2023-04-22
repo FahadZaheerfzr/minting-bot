@@ -1,29 +1,39 @@
 from telebot import types
-from telebot import TeleBot
-from web3 import Web3
 import requests
 from config import API_KEY, NFT_TOKEN_ADDRESS
 from components.tokenFunctions import getTokenInfo
 
 def start(message, bot):
-    # Make an API call
-    #get the token info
+    '''
+    This function responds to the /start command
+
+    Args:
+        message (telebot.types.Message): The message object
+        bot (telebot.TeleBot): The bot object
+    
+    Returns:
+        None
+    '''
 
 
+    # Parameters for the API call
+    start_block = 0
+    end_block = 999999999
+    
+    # Make an API call to get the latest minted token
+    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={NFT_TOKEN_ADDRESS}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + API_KEY)
 
-    response = requests.get('https://api-testnet.bscscan.com/api?module=account&action=txlist&address=0xC0f1182bB2bAF816177E09bDf909AC62201D8230&startblock=1&endblock=99999999&sort=asc&apikey=' + API_KEY)
-
+    # Convert the response to JSON
     response = response.json()
-    #here we will get the token info
 
 
-    #get hashes of all transactions
+    #Get Hashes of all transactions
     hashes = []
     for i in range(len(response['result'])):
         hashes.append(response['result'][i]['hash'])
     
 
-    #also the from addresses
+    # Get the from addresses of all transactions
     froms = []
     for i in range(len(response['result'])):
         froms.append(response['result'][i]['from'])
@@ -32,7 +42,7 @@ def start(message, bot):
     for i in range(len(response['result'])):
         hashes.append(response['result'][i]['hash'])
         
-    #to get the token ids
+    # To get the token ids
     tokenIDs = []
     for i in range(len(froms)):
         transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={NFT_TOKEN_ADDRESS}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
@@ -43,6 +53,7 @@ def start(message, bot):
 
     latestMint = int(tokenIDs[0])
     tokenInfo = getTokenInfo(NFT_TOKEN_ADDRESS, latestMint)
+    
     #return token info allowed, max supply and token uri
     #get image from token uri
     #send the image with the token info
@@ -58,13 +69,13 @@ def start(message, bot):
 
     # Create the formatted message
     caption = f"""
-🟩 <b>SSSS #{latestMint}</b> has been minted \n
-<code>Minter</code> : <a href="https://t.me/alexnotzank.bnb">@alexnotzank.bnb</a>\n
-<code>NFTs left</code>: <b>{-totalSupply+maxSupply} / {maxSupply}</b>\n
-<code>Timestamp</code>: Apr-20-2023 06:55:55 PM +UTC\n
-<b>Traits:</b>\n
-<code>state</code>:       <b>unrevealed</b>\n
-"""
+    🟩 <b>SSSS #{latestMint}</b> has been minted \n
+    <code>Minter</code> : <a href="https://t.me/alexnotzank.bnb">@alexnotzank.bnb</a>\n
+    <code>NFTs left</code>: <b>{maxSupply-totalSupply} / {maxSupply}</b>\n
+    <code>Timestamp</code>: Apr-20-2023 06:55:55 PM +UTC\n
+    <b>Traits:</b>\n
+    <code>state</code>:       <b>unrevealed</b>\n
+    """
 
     # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
     bot.send_photo(chat_id=message.chat.id, photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
