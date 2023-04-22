@@ -58,7 +58,7 @@ def start(message, bot):
 
     # Create the formatted message
     caption = f"""
-🟩 <b>SSSS #130</b> has been minted \n
+🟩 <b>SSSS #{latestMint}</b> has been minted \n
 <code>Minter</code> : <a href="https://t.me/alexnotzank.bnb">@alexnotzank.bnb</a>\n
 <code>NFTs left</code>: <b>{-totalSupply+maxSupply} / {maxSupply}</b>\n
 <code>Timestamp</code>: Apr-20-2023 06:55:55 PM +UTC\n
