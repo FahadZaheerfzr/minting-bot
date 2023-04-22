@@ -1,1 +1,5 @@
 __pycache__/
+    
+#also the pycache in components
+components/__pycache__/
+
