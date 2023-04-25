@@ -3,7 +3,7 @@ import requests
 from config import API_KEY, NFT_TOKEN_ADDRESS
 from components.listner.tokenFunctions import getTokenInfo
 
-def start( bot, num_transactions):
+def start( message,bot):
     '''
     This function responds to the /start command
 
@@ -77,9 +77,8 @@ def start( bot, num_transactions):
     <b>Traits:</b>\n
     <code>state</code>:       <b>unrevealed</b>\n
     """
-    print (len(tokenIDs), num_transactions)
-    if (len(tokenIDs) > num_transactions):
+
         # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
-        bot.send_photo(chat_id=6096960445, photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
+    bot.send_photo(chat_id=6096960445, photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
 
     return len(tokenIDs)

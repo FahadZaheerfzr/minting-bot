@@ -92,5 +92,5 @@ def listener(transactionCount, bot):
         """
 
     # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
-        bot.send_photo(chat_id="-1001684016421", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
+        bot.send_photo(chat_id="6096960445", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
     return data_length
