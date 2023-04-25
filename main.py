@@ -1,5 +1,6 @@
 from config import BOT_TOKEN 
 import telebot # pip install pyTelegramBotAPI
+import time
 from components.start import start #import the start function from the start.py file
 
 mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object with the bot token we have
@@ -20,4 +21,5 @@ print("Bot is running...")
 
 # run the check_transactions function in a while loop
 while True:
+    time.sleep(5)
     check_transactions()
