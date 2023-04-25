@@ -4,6 +4,8 @@ from components.start import start #import the start function from the start.py 
 from components.listner.listenTransactions import listener
 from components.database import DB
 import time
+from components.listner.helper import getInitialTransactionCount
+
 mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object with the bot token we have
 
 me = mint_bot.get_me() #get the bot information
@@ -17,7 +19,8 @@ url = group['url']
 chat_id = group['_id']
 contractId = group['contractId']
 
-transactionCount = 9
+transactionCount = getInitialTransactionCount(contractAddress=contractId) - 1
+
 
 while True:
     time.sleep(5)

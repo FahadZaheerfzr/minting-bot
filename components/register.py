@@ -2,7 +2,6 @@ from telebot import TeleBot
 from telebot import types
 from components.database import DB
 
-
 def register(message: types.Message, bot: TeleBot):
     try:
         DB['group'].insert_one({
