@@ -1,10 +1,10 @@
 from telebot import types
 import requests
-from config import API_KEY, NFT_TOKEN_ADDRESS
+from config import API_KEY
 from components.listner.tokenFunctions import getTokenInfo
 from datetime import datetime
 
-def listener(transactionCount, bot):
+def listener(transactionCount, bot, chat_id, url, contractId):
     '''
     This function listens to the transactions
 
@@ -21,7 +21,7 @@ def listener(transactionCount, bot):
     end_block = 999999999
     
     # Make an API call to get the latest minted token
-    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={NFT_TOKEN_ADDRESS}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + API_KEY)
+    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={contractId}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + API_KEY)
 
     # Convert the response to JSON
     response = response.json()
@@ -51,7 +51,7 @@ def listener(transactionCount, bot):
     # To get the token ids
     nftsMinted = []
     for i in range(len(froms)):
-        transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={NFT_TOKEN_ADDRESS}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
+        transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={contractId}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
         transactions = transactions.json()
         if transactions['result']:  # check if 'result' is not empty
             for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):
@@ -66,7 +66,7 @@ def listener(transactionCount, bot):
     nftsMinted.reverse()
     for nft in nftsMinted:
         try:
-            tokenInfo = getTokenInfo(NFT_TOKEN_ADDRESS, int(nft["id"]))
+            tokenInfo = getTokenInfo(contractId, int(nft["id"]))
         except:
             print("Token not found")
             continue
@@ -78,7 +78,7 @@ def listener(transactionCount, bot):
         totalSupply = tokenInfo['totalSupply']
 
         # Create the "Mint here!" button
-        mint_btn = types.InlineKeyboardButton("Mint here!", callback_data="mint")
+        mint_btn = types.InlineKeyboardButton(f"<a href='{url}'>Mint here!</a>", callback_data="mint")
 
         # Create the inline keyboard and add the "Mint here!" button to it
         markup = types.InlineKeyboardMarkup().add(mint_btn)
@@ -92,5 +92,5 @@ def listener(transactionCount, bot):
         """
 
     # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
-        bot.send_photo(chat_id="6096960445", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
+        bot.send_photo(chat_id=f"{chat_id}", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
     return data_length

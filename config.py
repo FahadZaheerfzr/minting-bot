@@ -16,4 +16,4 @@ NFT_ABI = json.loads(
 )
 
 # the contract address of the nft erc721 token
-NFT_TOKEN_ADDRESS = "0xC0f1182bB2bAF816177E09bDf909AC62201D8230"
+contractId = "0xC0f1182bB2bAF816177E09bDf909AC62201D8230"

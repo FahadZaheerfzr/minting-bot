@@ -1,6 +1,6 @@
 from telebot import types
 import requests
-from config import API_KEY, NFT_TOKEN_ADDRESS
+from config import API_KEY, contractId
 from components.listner.tokenFunctions import getTokenInfo
 
 def start( message,bot):
@@ -21,7 +21,7 @@ def start( message,bot):
     end_block = 999999999
     
     # Make an API call to get the latest minted token
-    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={NFT_TOKEN_ADDRESS}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + API_KEY)
+    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={contractId}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + API_KEY)
 
     # Convert the response to JSON
     response = response.json()
@@ -46,14 +46,14 @@ def start( message,bot):
     # To get the token ids
     tokenIDs = []
     for i in range(len(froms)):
-        transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={NFT_TOKEN_ADDRESS}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
+        transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={contractId}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
         transactions = transactions.json()
         if transactions['result']:  # check if 'result' is not empty
             for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):
                 tokenIDs.append(tx['tokenID'])
 
     latestMint = int(tokenIDs[0])
-    tokenInfo = getTokenInfo(NFT_TOKEN_ADDRESS, latestMint)
+    tokenInfo = getTokenInfo(contractId, latestMint)
     
     #return token info allowed, max supply and token uri
     #get image from token uri
