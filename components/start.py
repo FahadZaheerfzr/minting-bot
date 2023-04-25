@@ -3,7 +3,7 @@ import requests
 from config import API_KEY, NFT_TOKEN_ADDRESS
 from components.tokenFunctions import getTokenInfo
 
-def start(message, bot):
+def start( bot, num_transactions):
     '''
     This function responds to the /start command
 
@@ -76,6 +76,9 @@ def start(message, bot):
     <b>Traits:</b>\n
     <code>state</code>:       <b>unrevealed</b>\n
     """
+    print (len(tokenIDs), num_transactions)
+    if (len(tokenIDs) > num_transactions):
+        # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
+        bot.send_photo(chat_id=6096960445, photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
 
-    # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
-    bot.send_photo(chat_id=message.chat.id, photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
+    return len(tokenIDs)

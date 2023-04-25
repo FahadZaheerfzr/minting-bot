@@ -4,11 +4,20 @@ from components.start import start #import the start function from the start.py 
 
 mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object with the bot token we have
 
-#message handlers
-mint_bot.register_message_handler(start, pass_bot=True, commands=["start"]) #register the start function to the /start command we are passing the bot object and a function to check if the message is a command
+#global num_transactions
+num_transactions = 0
+# define a function to check for new transactions
+def check_transactions():
+    global num_transactions # use the global keyword to access the global variable
+    num_transactions=start(mint_bot,num_transactions)
+    # update the last number of transactions for future checks
+
+# initialize the last number of transactions to 0
 
 me = mint_bot.get_me() #get the bot information
 print(me.username) #print the bot username
 print("Bot is running...")
-#set bot to listen to commands
-mint_bot.polling()
+
+# run the check_transactions function in a while loop
+while True:
+    check_transactions()
