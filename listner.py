@@ -8,6 +8,9 @@ mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object wit
 me = mint_bot.get_me() #get the bot information
 print(me.username) #print the bot username
 
+
+
+
 transactionCount = 9
 
 while True:

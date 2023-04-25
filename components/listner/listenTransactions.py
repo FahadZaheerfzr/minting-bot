@@ -25,6 +25,8 @@ def listener(transactionCount, bot):
 
     # Convert the response to JSON
     response = response.json()
+
+
     data = sorted(response['result'], key=lambda x: x['timeStamp'], reverse=True)
     data_length = len(data)
 
@@ -36,17 +38,15 @@ def listener(transactionCount, bot):
     #Get Hashes of all transactions
     hashes = []
     for i in range(data_length-transactionCount):
-        hashes.append(data[i]['hash'])
+        if data[i]['methodId'] == "0xa0712d68":
+            hashes.append(data[i]['hash'])
     
 
     # Get the from addresses of all transactions
     froms = []
     for i in range(data_length-transactionCount):
-        froms.append(data[i]['from'])
-    
-    hashes = []
-    for i in range(data_length-transactionCount):
-        hashes.append(data[i]['hash'])
+        if data[i]['from'] not in froms and data[i]['methodId'] == "0xa0712d68":
+            froms.append(data[i]['from'])
         
     # To get the token ids
     nftsMinted = []
