@@ -2,6 +2,7 @@ from telebot import types
 import requests
 from config import API_KEY, NFT_TOKEN_ADDRESS
 from components.listner.tokenFunctions import getTokenInfo
+from datetime import datetime
 
 def listener(transactionCount, bot):
     '''
@@ -24,10 +25,11 @@ def listener(transactionCount, bot):
 
     # Convert the response to JSON
     response = response.json()
+
+
     data = sorted(response['result'], key=lambda x: x['timeStamp'], reverse=True)
     data_length = len(data)
 
-    print(type(data_length))
     if data_length <= transactionCount:
         return data_length
     
@@ -36,35 +38,38 @@ def listener(transactionCount, bot):
     #Get Hashes of all transactions
     hashes = []
     for i in range(data_length-transactionCount):
-        hashes.append(data[i]['hash'])
+        if data[i]['methodId'] == "0xa0712d68":
+            hashes.append(data[i]['hash'])
     
 
     # Get the from addresses of all transactions
     froms = []
     for i in range(data_length-transactionCount):
-        froms.append(data[i]['from'])
-    
-    hashes = []
-    for i in range(data_length-transactionCount):
-        hashes.append(data[i]['hash'])
+        if data[i]['from'] not in froms and data[i]['methodId'] == "0xa0712d68":
+            froms.append(data[i]['from'])
         
     # To get the token ids
-    tokenIDs = []
+    nftsMinted = []
     for i in range(len(froms)):
         transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={NFT_TOKEN_ADDRESS}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
         transactions = transactions.json()
         if transactions['result']:  # check if 'result' is not empty
             for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):
                 if (tx['hash'] in hashes):
-                    tokenIDs.append(tx['tokenID'])
-
-    for ids in tokenIDs:    
+                    nftsMinted.append(
+                        {
+                            'id': tx['tokenID'],
+                            'from': froms[i],
+                            'timestamp': datetime.fromtimestamp(int(tx['timeStamp']))
+                        }
+                    )
+    nftsMinted.reverse()
+    for nft in nftsMinted:
         try:
-            latestMint = int(tokenIDs[0])
-            tokenInfo = getTokenInfo(NFT_TOKEN_ADDRESS, latestMint)
+            tokenInfo = getTokenInfo(NFT_TOKEN_ADDRESS, int(nft["id"]))
         except:
-            print("Error getting token info")
-
+            print("Token not found")
+            continue
         #return token info allowed, max supply and token uri
         #get image from token uri
         #send the image with the token info
@@ -80,14 +85,12 @@ def listener(transactionCount, bot):
 
         # Create the formatted message
         caption = f"""
-        🟩 <b>SSSS #{latestMint}</b> has been minted \n
-        <code>Minter</code> : <a href="https://t.me/alexnotzank.bnb">@alexnotzank.bnb</a>\n
-        <code>NFTs left</code>: <b>{maxSupply-totalSupply} / {maxSupply}</b>\n
-        <code>Timestamp</code>: Apr-20-2023 06:55:55 PM +UTC\n
-        <b>Traits:</b>\n
-        <code>state</code>:       <b>unrevealed</b>\n
+        🟩 <b>SSSS #{nft["id"]}</b> has been minted \n
+<code>Minter</code> : {nft["from"]}\n
+<code>NFTs left</code>: <b>{maxSupply-totalSupply} / {maxSupply}</b>\n
+<code>Timestamp</code>: {nft["timestamp"]} +UTC\n
         """
 
     # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
-        bot.send_photo(chat_id="1001684016421", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
+        bot.send_photo(chat_id="-1001684016421", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
     return data_length

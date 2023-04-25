@@ -15,7 +15,7 @@ def start( bot, num_transactions):
         None
     '''
 
-
+    print(message.chat.id)
     # Parameters for the API call
     start_block = 0
     end_block = 999999999
