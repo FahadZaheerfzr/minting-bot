@@ -78,7 +78,7 @@ def listener(transactionCount, bot, chat_id, url, contractId):
         totalSupply = tokenInfo['totalSupply']
 
         # Create the "Mint here!" button
-        mint_btn = types.InlineKeyboardButton(f"<a href='{url}'>Mint here!</a>", callback_data="mint")
+        mint_btn = types.InlineKeyboardButton(text="Mint here!", url=url)
 
         # Create the inline keyboard and add the "Mint here!" button to it
         markup = types.InlineKeyboardMarkup().add(mint_btn)
