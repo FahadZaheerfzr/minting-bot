@@ -68,7 +68,6 @@ def listener(transactionCount, bot, chat_id, url, contractId):
         try:
             tokenInfo = getTokenInfo(contractId, int(nft["id"]))
         except:
-            print("Token not found")
             continue
         #return token info allowed, max supply and token uri
         #get image from token uri

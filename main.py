@@ -14,5 +14,4 @@ mint_bot.register_message_handler(settings, pass_bot=True, commands=['settings']
 
 me = mint_bot.get_me() #get the bot information
 print(me.username) #print the bot username
-print("Listening main...")
 mint_bot.polling() #start the bot

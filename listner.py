@@ -12,17 +12,15 @@ me = mint_bot.get_me() #get the bot information
 print(me.username) #print the bot username
 
 
-# taking the url, contractId and _id from group with name "farad and lars" abhi kai liyai, later will get all, abhi cant see what array i get cuz cant run
-group = DB['group'].find_one({"name": "farad and lars"})
-#the url
-url = group['url']
-chat_id = group['_id']
-contractId = group['contractId']
-
-transactionCount = getInitialTransactionCount(contractAddress=contractId) - 1
-
 
 while True:
-    time.sleep(5)
-    print("Listening...")
-    transactionCount = listener(transactionCount, mint_bot, chat_id, url, contractId)
+    groups = DB['group'].find()
+    for group in groups:
+        time.sleep(1)
+        url = group['url']
+        chat_id = group['_id']
+        contractId = group['contractId']
+        transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group else getInitialTransactionCount(contractId) - 1
+        transactionCount = listener(transactionCount, mint_bot, chat_id, url, contractId)
+        DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTransactionCount": transactionCount}})
+
