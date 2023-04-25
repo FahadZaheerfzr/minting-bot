@@ -12,7 +12,7 @@ def register(message: types.Message, bot: TeleBot):
             "owner": message.from_user.id,
             "name": message.chat.title,
         })
-        bot.reply_to(message, "Group Registered, Use /help to manage it")
+        bot.reply_to(message, "Group Registered, Use /settings to manage it")
     except Exception as e:
         print(e)
         bot.reply_to(message, "This community is already registered. Please use /setting to configure your community.")
