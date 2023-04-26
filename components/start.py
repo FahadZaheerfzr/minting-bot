@@ -1,7 +1,7 @@
 from telebot import types
 import requests
 from config import API_KEY, contractId
-from components.listner.tokenFunctions import getTokenInfo
+from components.listner.helper import getTokenInfo
 
 def start( message,bot):
     '''

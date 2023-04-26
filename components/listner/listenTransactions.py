@@ -1,10 +1,9 @@
 from telebot import types
 import requests
 from config import API_KEY
-from components.listner.tokenFunctions import getTokenInfo
-from datetime import datetime
+from components.listner.helper import getTokenInfo, formattedPost, getNFTs
 
-def listener(transactionCount, bot, chat_id, url, contractId):
+def listener(transactionCount, bot, chat_id, url, contractId, methodId):
     '''
     This function listens to the transactions
 
@@ -14,14 +13,9 @@ def listener(transactionCount, bot, chat_id, url, contractId):
     Returns:
         None
     '''
-
-
-    # Parameters for the API call
-    start_block = 0
-    end_block = 999999999
     
     # Make an API call to get the latest minted token
-    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={contractId}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + API_KEY)
+    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={contractId}&startblock=0&endblock=999999999&sort=asc&apikey=' + API_KEY)
 
     # Convert the response to JSON
     response = response.json()
@@ -36,32 +30,19 @@ def listener(transactionCount, bot, chat_id, url, contractId):
     #Get Hashes of all transactions
     hashes = []
     for i in range(data_length-transactionCount):
-        if data[i]['methodId'] == "0xa0712d68":
+        if data[i]['methodId'] == methodId:
             hashes.append(data[i]['hash'])
     
 
     # Get the from addresses of all transactions
     froms = []
     for i in range(data_length-transactionCount):
-        if data[i]['from'] not in froms and data[i]['methodId'] == "0xa0712d68":
+        if data[i]['from'] not in froms and data[i]['methodId'] == methodId:
             froms.append(data[i]['from'])
         
     # To get the token ids
-    nftsMinted = []
-    for i in range(len(froms)):
-        transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={contractId}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
-        transactions = transactions.json()
-        if transactions['result']:  # check if 'result' is not empty
-            for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):
-                if (tx['hash'] in hashes):
-                    nftsMinted.append(
-                        {
-                            'id': tx['tokenID'],
-                            'from': froms[i],
-                            'timestamp': datetime.fromtimestamp(int(tx['timeStamp']))
-                        }
-                    )
-    nftsMinted.reverse()
+    nftsMinted = getNFTs(froms, hashes, contractId)
+    
     for nft in nftsMinted:
         try:
             tokenInfo = getTokenInfo(contractId, int(nft["id"]))
@@ -71,7 +52,11 @@ def listener(transactionCount, bot, chat_id, url, contractId):
         #return token info allowed, max supply and token uri
         #get image from token uri
         #send the image with the token info
-        image = requests.get(tokenInfo['tokenURI']).json()['image']
+        try:
+            image = requests.get(tokenInfo['tokenURI']).json()['image']
+        except:
+            image = requests.get(tokenInfo['tokenURI']+".jpg").content
+
         maxSupply = tokenInfo['maxSupply']
         totalSupply = tokenInfo['totalSupply']
 
@@ -83,19 +68,9 @@ def listener(transactionCount, bot, chat_id, url, contractId):
 
         # Create the formatted message
         if maxSupply == "Infinity":
-            caption = f"""
-            🟩 <b>SSSS #{nft["id"]}</b> has been minted \n
-    <code>Minter</code> : {nft["from"]}\n
-    <code>NFTs left</code>: <b>{totalSupply} / {maxSupply}</b>\n
-    <code>Timestamp</code>: {nft["timestamp"]} +UTC\n
-            """
+            caption = formattedPost(nft["id"], nft["from"], totalSupply, "Infinity", nft["timestamp"])
         else:
-            caption = f"""
-            🟩 <b>SSSS #{nft["id"]}</b> has been minted \n
-    <code>Minter</code> : {nft["from"]}\n
-    <code>NFTs left</code>: <b>{maxSupply-totalSupply} / {maxSupply}</b>\n
-    <code>Timestamp</code>: {nft["timestamp"]} +UTC\n
-            """
+            caption = formattedPost(nft["id"], nft["from"], maxSupply-totalSupply, maxSupply, nft["timestamp"])
 
     # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
         bot.send_photo(chat_id=f"{chat_id}", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')

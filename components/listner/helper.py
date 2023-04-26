@@ -1,6 +1,10 @@
 import requests
-from config import API_KEY
+from config import API_KEY,RPC_ADDRESS, NFT_ABI
+from web3 import Web3
+from datetime import datetime
 
+# Create the web3 object
+web3 = Web3(Web3.HTTPProvider(RPC_ADDRESS))
 
 def getInitialTransactionCount(contractAddress:str):
     '''
@@ -25,3 +29,66 @@ def getInitialTransactionCount(contractAddress:str):
     data_length = len(response['result'])
 
     return data_length
+
+
+def getTokenInfo(tokenAddress,tokenId):
+    '''
+    This function returns the token info
+    Args:
+        tokenAddress (str): The token address
+        tokenId (int): The token id
+    
+    Returns:
+        dict: The token info
+    '''
+
+    # Create the contract object
+    tokenContract = web3.eth.contract(address=tokenAddress, abi=NFT_ABI)
+    
+    # Get the token info
+    try:
+        maxSupply = tokenContract.functions.maxSupply().call()
+    except:
+        maxSupply = "Infinity"
+    
+
+    tokenURI = tokenContract.functions.tokenURI(tokenId).call()
+    totalSupply = tokenContract.functions.totalSupply().call()
+
+    # Return the token info
+    return {
+        "maxSupply": maxSupply,
+        "tokenURI": tokenURI,
+        "totalSupply": totalSupply
+    }
+
+
+
+def getNFTs(froms, hashes, contractId):
+    nftsMinted = []
+    for i in range(len(froms)):
+        transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={contractId}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
+        transactions = transactions.json()
+        if transactions['result']:  # check if 'result' is not empty
+            for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):
+                if (tx['hash'] in hashes):
+                    nftsMinted.append(
+                        {
+                            'id': tx['tokenID'],
+                            'from': froms[i],
+                            'timestamp': datetime.fromtimestamp(int(tx['timeStamp']))
+                        }
+                    )
+    nftsMinted.reverse()
+
+    return nftsMinted
+
+
+
+def formattedPost(id, from_address, consumed, max, timestamp):
+    return f"""
+    🟩 <b>SSSS #{id}</b> has been minted \n
+<code>Minter</code>: {from_address}\n
+<code>NFTs left</code>: <b> {consumed} / {max}</b>\n
+<code>Timestamp</code>: {timestamp} +UTC\n
+    """
