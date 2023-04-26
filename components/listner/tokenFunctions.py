@@ -20,14 +20,17 @@ def getTokenInfo(tokenAddress,tokenId):
     tokenContract = web3.eth.contract(address=tokenAddress, abi=NFT_ABI)
     
     # Get the token info
-    allowed = tokenContract.functions.allowedPerBatch().call()
-    maxSupply = tokenContract.functions.maxSupply().call()
+    try:
+        maxSupply = tokenContract.functions.maxSupply().call()
+    except:
+        maxSupply = "Infinity"
+    
+
     tokenURI = tokenContract.functions.tokenURI(tokenId).call()
     totalSupply = tokenContract.functions.totalSupply().call()
 
     # Return the token info
     return {
-        "allowed": allowed,
         "maxSupply": maxSupply,
         "tokenURI": tokenURI,
         "totalSupply": totalSupply

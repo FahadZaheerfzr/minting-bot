@@ -16,7 +16,7 @@ def changeContractId(message:types.Message, bot:TeleBot):
         return
     
     #update the contract id
-    DB['group'].update_one({"_id": chat_id}, {"$set": {"contractId": message.text}})
+    DB['group'].update_one({"_id": chat_id}, {"$set": {"contractId": message.text, "lastTransactionCount": None}})
     bot.reply_to(message, "Contract Id updated successfully")
 
 

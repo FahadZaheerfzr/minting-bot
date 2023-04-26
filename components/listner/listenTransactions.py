@@ -29,11 +29,9 @@ def listener(transactionCount, bot, chat_id, url, contractId):
 
     data = sorted(response['result'], key=lambda x: x['timeStamp'], reverse=True)
     data_length = len(data)
-
     if data_length <= transactionCount:
         return data_length
     
-
 
     #Get Hashes of all transactions
     hashes = []
@@ -67,7 +65,8 @@ def listener(transactionCount, bot, chat_id, url, contractId):
     for nft in nftsMinted:
         try:
             tokenInfo = getTokenInfo(contractId, int(nft["id"]))
-        except:
+        except Exception as e:
+            print(e)
             continue
         #return token info allowed, max supply and token uri
         #get image from token uri
@@ -83,12 +82,20 @@ def listener(transactionCount, bot, chat_id, url, contractId):
         markup = types.InlineKeyboardMarkup().add(mint_btn)
 
         # Create the formatted message
-        caption = f"""
-        🟩 <b>SSSS #{nft["id"]}</b> has been minted \n
-<code>Minter</code> : {nft["from"]}\n
-<code>NFTs left</code>: <b>{maxSupply-totalSupply} / {maxSupply}</b>\n
-<code>Timestamp</code>: {nft["timestamp"]} +UTC\n
-        """
+        if maxSupply == "Infinity":
+            caption = f"""
+            🟩 <b>SSSS #{nft["id"]}</b> has been minted \n
+    <code>Minter</code> : {nft["from"]}\n
+    <code>NFTs left</code>: <b>{totalSupply} / {maxSupply}</b>\n
+    <code>Timestamp</code>: {nft["timestamp"]} +UTC\n
+            """
+        else:
+            caption = f"""
+            🟩 <b>SSSS #{nft["id"]}</b> has been minted \n
+    <code>Minter</code> : {nft["from"]}\n
+    <code>NFTs left</code>: <b>{maxSupply-totalSupply} / {maxSupply}</b>\n
+    <code>Timestamp</code>: {nft["timestamp"]} +UTC\n
+            """
 
     # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
         bot.send_photo(chat_id=f"{chat_id}", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
