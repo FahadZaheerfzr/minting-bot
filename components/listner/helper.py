@@ -2,11 +2,13 @@ import requests
 from config import API_KEY,RPC_ADDRESS, NFT_ABI
 from web3 import Web3
 from datetime import datetime
+from components.database import DB
+from components.listner.networkConfig import NetworkConfig
 
 # Create the web3 object
 web3 = Web3(Web3.HTTPProvider(RPC_ADDRESS))
 
-def getInitialTransactionCount(contractAddress:str):
+def getInitialTransactionCount(contractAddress:str, chat_id:int):
     '''
     This function returns the initial transaction count
     Args:
@@ -19,9 +21,17 @@ def getInitialTransactionCount(contractAddress:str):
     # Parameters for the API call
     start_block = 0
     end_block = 999999999
+
+    #get the network from db
+    network = DB['group'].find_one({"_id": chat_id})['network']
+
+    #get the network config
+    networkConfig = NetworkConfig(network)
+
+
     
     # Make an API call to get the latest minted token
-    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={contractAddress}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + API_KEY)
+    response = requests.get(f'{networkConfig.api_url}?module=account&action=txlist&address={contractAddress}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + networkConfig.get_api_key())
 
     # Convert the response to JSON
     response = response.json()
@@ -64,10 +74,16 @@ def getTokenInfo(tokenAddress,tokenId):
 
 
 
-def getNFTs(froms, hashes, contractId):
+def getNFTs(froms, hashes, contractId, chat_id):
+    #get the network from db
+    network = DB['group'].find_one({"_id": chat_id})['network']
+
+    #get the network config
+    networkConfig = NetworkConfig(network)
+
     nftsMinted = []
     for i in range(len(froms)):
-        transactions = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=tokennfttx&contractaddress={contractId}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={API_KEY}')
+        transactions = requests.get(f'{networkConfig.api_url}?module=account&action=tokennfttx&contractaddress={contractId}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={networkConfig.get_api_key()}')
         transactions = transactions.json()
         if transactions['result']:  # check if 'result' is not empty
             for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):

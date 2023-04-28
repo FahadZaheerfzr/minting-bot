@@ -2,6 +2,8 @@ from telebot import types
 import requests
 from config import API_KEY
 from components.listner.helper import getTokenInfo, formattedPost, getNFTs
+from components.listner.networkConfig import NetworkConfig
+from components.database import DB
 
 def listener(transactionCount, bot, chat_id, url, contractId, methodId):
     '''
@@ -13,9 +15,15 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId):
     Returns:
         None
     '''
+
+    #get the network from db
+    network = DB['group'].find_one({"_id": chat_id})['network']
+
+    #get the network config
+    networkConfig = NetworkConfig(network)
     
     # Make an API call to get the latest minted token
-    response = requests.get(f'https://api-testnet.bscscan.com/api?module=account&action=txlist&address={contractId}&startblock=0&endblock=999999999&sort=asc&apikey=' + API_KEY)
+    response = requests.get(f'{networkConfig.api_url}?module=account&action=txlist&address={contractId}&startblock=0&endblock=999999999&sort=asc&apikey=' + networkConfig.get_api_key())
 
     # Convert the response to JSON
     response = response.json()
@@ -41,7 +49,7 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId):
             froms.append(data[i]['from'])
         
     # To get the token ids
-    nftsMinted = getNFTs(froms, hashes, contractId)
+    nftsMinted = getNFTs(froms, hashes, contractId, chat_id)
     
     for nft in nftsMinted:
         try:

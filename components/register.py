@@ -11,6 +11,7 @@ def register(message: types.Message, bot: TeleBot):
             "owner": message.from_user.id,
             "name": message.chat.title,
             "methodId": "0xa0712d68",
+            "network": "bsc_testnet",
         })
         bot.reply_to(message, "Group Registered, Use /settings to manage it")
     except Exception as e:
