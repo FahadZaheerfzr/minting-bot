@@ -1,6 +1,5 @@
 from config import BOT_TOKEN 
 import telebot # pip install pyTelegramBotAPI
-from components.start import start #import the start function from the start.py file
 from components.register import register #import the register function from the register.py file
 from components.settings import settings, changeContractId, changeMethodId, changeUrl #import the settings function from the settings.py file
 from components.database import DB

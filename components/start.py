@@ -3,7 +3,7 @@ import requests
 from config import API_KEY, contractId
 from components.listner.helper import getTokenInfo
 
-def start( message,bot):
+def start(message, bot):
     '''
     This function responds to the /start command
 
