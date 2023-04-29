@@ -3,7 +3,6 @@ import telebot # pip install pyTelegramBotAPI
 from components.start import start #import the start function from the start.py file
 from components.listner.listenTransactions import listener
 from components.database import DB
-import time
 from components.listner.helper import getInitialTransactionCount
 
 mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object with the bot token we have
