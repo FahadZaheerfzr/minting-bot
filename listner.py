@@ -26,11 +26,11 @@ while True:
         methodId = group['methodId']
         
         # Get the last transaction count from the database if it exists else get the initial transaction count from the blockchain
-        transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group else getInitialTransactionCount(contractId, chat_id) - 5
-
-        # Call the listener function
+        transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group and group['lastTransactionCount'] is not None else getInitialTransactionCount(contractId, chat_id) - 5        # Call the listener function
         transactionCount = listener(transactionCount, mint_bot, chat_id, url, contractId, methodId)
 
         # Update the last transaction count in the database
+        print("Updating the database with the last transaction count: ", transactionCount)
+        print("For the group: ", chat_id)
         DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTransactionCount": transactionCount}})
 
