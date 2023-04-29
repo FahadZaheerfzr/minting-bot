@@ -6,42 +6,29 @@ from components.listner.networkConfig import NetworkConfig
 from components.database import DB
 
 def listener(transactionCount, bot, chat_id, url, contractId, methodId):
-    '''
-    This function listens to the transactions
-
-    Args:
-        bot (telebot.TeleBot): The bot object
-    
-    Returns:
-        None
-    '''
-
-    #get the network from db
+    # get the network from db
     network = DB['group'].find_one({"_id": chat_id})['network']
 
-    #get the network config
+    # get the network config
     networkConfig = NetworkConfig(network)
-    
+
     # Make an API call to get the latest minted token
     response = requests.get(f'{networkConfig.api_url}?module=account&action=txlist&address={contractId}&startblock=0&endblock=999999999&sort=asc&apikey=' + networkConfig.get_api_key())
 
     # Convert the response to JSON
     response = response.json()
 
-
     data = sorted(response['result'], key=lambda x: x['timeStamp'], reverse=True)
     data_length = len(data)
     if data_length <= transactionCount:
         return data_length
     
-
-    #Get Hashes of all transactions
+    # Get hashes of all transactions
     hashes = []
     for i in range(data_length-transactionCount):
         if data[i]['methodId'] == methodId:
             hashes.append(data[i]['hash'])
     
-
     # Get the from addresses of all transactions
     froms = []
     for i in range(data_length-transactionCount):
@@ -53,13 +40,11 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId):
     
     for nft in nftsMinted:
         try:
-            tokenInfo = getTokenInfo(contractId, int(nft["id"]))
+            tokenInfo = getTokenInfo(contractId, int(nft["id"]), chat_id)
         except Exception as e:
             print(e)
             continue
-        #return token info allowed, max supply and token uri
-        #get image from token uri
-        #send the image with the token info
+        
         try:
             image = requests.get(tokenInfo['tokenURI']).json()['image']
         except:
@@ -68,11 +53,10 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId):
         maxSupply = tokenInfo['maxSupply']
         totalSupply = tokenInfo['totalSupply']
 
-        # Create the "Mint here!" button
-        mint_btn = types.InlineKeyboardButton(text="Mint here!", url=url)
-
-        # Create the inline keyboard and add the "Mint here!" button to it
-        markup = types.InlineKeyboardMarkup().add(mint_btn)
+        # Create the "Mint here!" 
+        button = types.InlineKeyboardButton(text="Mint here!", callback_data="mint", url=url)
+        markup = types.InlineKeyboardMarkup()
+        markup.add(button)
 
         # Create the formatted message
         if maxSupply == "Infinity":
@@ -80,6 +64,10 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId):
         else:
             caption = formattedPost(nft["id"], nft["from"], maxSupply-totalSupply, maxSupply, nft["timestamp"])
 
-    # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
-        bot.send_photo(chat_id=f"{chat_id}", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
+        # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
+        try:
+            bot.send_photo(chat_id=f"{chat_id}", photo=image, caption=caption, reply_markup=markup, parse_mode='HTML')
+        except Exception as e:
+            print(e)
+
     return data_length

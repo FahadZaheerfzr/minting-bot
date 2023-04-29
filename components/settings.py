@@ -159,9 +159,9 @@ def settings(message, bot):
 
     # create the inline keyboard for settings selection
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("Change URL", callback_data="changeUrl"),
-               types.InlineKeyboardButton("Change Contract Id", callback_data="changeContractId"),
-               types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId"),
-               types.InlineKeyboardButton("Change Network", callback_data="changeNetwork"))
+    markup.add(types.InlineKeyboardButton("Change URL", callback_data="changeUrl"))
+    markup.add(types.InlineKeyboardButton("Change Contract Id", callback_data="changeContractId"))
+    markup.add(types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId"))
+    markup.add(types.InlineKeyboardButton("Change Network", callback_data="changeNetwork"))
 
     bot.reply_to(message, "Please select the setting you want to change:", reply_markup=markup)

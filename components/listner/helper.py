@@ -5,8 +5,6 @@ from datetime import datetime
 from components.database import DB
 from components.listner.networkConfig import NetworkConfig
 
-# Create the web3 object
-web3 = Web3(Web3.HTTPProvider(RPC_ADDRESS))
 
 def getInitialTransactionCount(contractAddress:str, chat_id:int):
     '''
@@ -38,10 +36,12 @@ def getInitialTransactionCount(contractAddress:str, chat_id:int):
 
     data_length = len(response['result'])
 
+    print("Initial transaction count: ", data_length)
+
     return data_length
 
 
-def getTokenInfo(tokenAddress,tokenId):
+def getTokenInfo(tokenAddress,tokenId,chat_id):
     '''
     This function returns the token info
     Args:
@@ -51,6 +51,15 @@ def getTokenInfo(tokenAddress,tokenId):
     Returns:
         dict: The token info
     '''
+    #get the network from db
+    network = DB['group'].find_one({"_id": chat_id})['network']
+
+    #get the network config
+    networkConfig = NetworkConfig(network)
+
+    # Create the web3 object
+    web3 = Web3(Web3.HTTPProvider(networkConfig.rpc_url))
+
 
     # Create the contract object
     tokenContract = web3.eth.contract(address=tokenAddress, abi=NFT_ABI)
