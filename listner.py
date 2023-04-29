@@ -17,11 +17,16 @@ while True:
     # Loop through the groups
     for group in groups:
         # Get the group information
+        
         url = group['url']
         chat_id = group['_id']
         contractId = group['contractId']
         methodId = group['methodId']
         lastTokenID = group['lastTokenID'] if 'lastTokenID' in group and group['lastTokenID'] is not None else None
+        
+        if contractId is None or methodId is None or url is None:
+            continue
+        
         # Get the last transaction count from the database if it exists else get the initial transaction count from the blockchain
         transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group and group['lastTransactionCount'] is not None else getInitialTransactionCount(contractId, chat_id) - 5        # Call the listener function
         transactionCount, lastTokenID = listener(transactionCount, mint_bot, chat_id, url, contractId, methodId, lastTokenID)
