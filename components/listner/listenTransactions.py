@@ -5,7 +5,7 @@ from components.listner.helper import getTokenInfo, formattedPost, getNFTs
 from components.listner.networkConfig import NetworkConfig
 from components.database import DB
 
-def listener(transactionCount, bot, chat_id, url, contractId, methodId):
+def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastTokenID):
     # get the network from db
     network = DB['group'].find_one({"_id": chat_id})['network']
 
@@ -21,7 +21,9 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId):
     data = sorted(response['result'], key=lambda x: x['timeStamp'], reverse=True)
     data_length = len(data)
     if data_length <= transactionCount:
-        return data_length
+        if data_length == 10000:
+            return (data_length - 100, None)
+        return (data_length, None)
     
     # Get hashes of all transactions
     hashes = []
@@ -37,8 +39,9 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId):
         
     # To get the token ids
     nftsMinted = getNFTs(froms, hashes, contractId, chat_id)
-    
     for nft in nftsMinted:
+        if lastTokenID is not None and int(nft["id"]) <= lastTokenID:
+            return
         try:
             tokenInfo = getTokenInfo(contractId, int(nft["id"]), chat_id)
         except Exception as e:
@@ -70,4 +73,7 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId):
         except Exception as e:
             print(e)
 
-    return data_length
+    if data_length == 10000:
+        return (data_length - 100, int(nftsMinted[0]["id"]))
+
+    return (data_length, None)
