@@ -164,4 +164,10 @@ def settings(message, bot):
     markup.add(types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId"))
     markup.add(types.InlineKeyboardButton("Change Network", callback_data="changeNetwork"))
 
-    bot.reply_to(message, "Please select the setting you want to change:", reply_markup=markup)
+    bot.reply_to(message, settingFormat(), reply_markup=markup, parse_mode="HTML")
+
+
+def settingFormat():
+    return """
+<b>Please select the setting you want to change:</b>
+"""

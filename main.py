@@ -8,7 +8,7 @@ from components.database import DB
 mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object with the bot token we have
 
 #message handler for the /start command
-# mint_bot.register_message_handler(start, pass_bot=True, commands=['start'])
+mint_bot.register_message_handler(start, pass_bot=True, commands=['start'])
 mint_bot.register_message_handler(register, pass_bot=True, commands=['register'])
 mint_bot.register_message_handler(settings, pass_bot=True, commands=['settings'])
 
