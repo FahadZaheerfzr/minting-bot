@@ -4,6 +4,7 @@ from components.start import start #import the start function from the start.py 
 from components.listner.listenTransactions import listener
 from components.database import DB
 from components.listner.helper import getInitialTransactionCount
+import time
 
 mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object with the bot token we have
 
@@ -14,6 +15,9 @@ print(me.username) #print the bot username
 while True:
     # Find all the groups
     groups = DB['group'].find()
+
+    if len(group) < 4:
+        time.sleep(1)
     # Loop through the groups
     for group in groups:
         # Get the group information

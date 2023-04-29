@@ -20,6 +20,7 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
 
     data = sorted(response['result'], key=lambda x: x['timeStamp'], reverse=True)
     data_length = len(data)
+    print(response["result"])
     if data_length <= transactionCount:
         if data_length == 10000:
             return (data_length - 100, None)
