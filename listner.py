@@ -15,8 +15,8 @@ print(me.username) #print the bot username
 while True:
     # Find all the groups
     groups = DB['group'].find()
-
-    if len(group) < 4:
+    
+    if len(groups) < 4:
         time.sleep(1)
     # Loop through the groups
     for group in groups:
