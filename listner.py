@@ -16,8 +16,7 @@ while True:
     # Find all the groups
     groups = DB['group'].find()
     
-    if len(groups) < 4:
-        time.sleep(1)
+    time.sleep(1)
     # Loop through the groups
     for group in groups:
         # Get the group information
