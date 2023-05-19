@@ -32,7 +32,7 @@ while True:
             continue
         
         # Get the last transaction count from the database if it exists else get the initial transaction count from the blockchain
-        transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group and group['lastTransactionCount'] is not None else getInitialTransactionCount(contractId, chat_id) - 5        # Call the listener function
+        transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group and group['lastTransactionCount'] is not None else getInitialTransactionCount(contractId, chat_id) - 1        # Call the listener function
         transactionCount, lastTokenID = listener(transactionCount, mint_bot, chat_id, url, contractId, methodId, lastTokenID)
 
         # Update the last transaction count in the database
