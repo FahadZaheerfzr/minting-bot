@@ -15,19 +15,18 @@ print(me.username) #print the bot username
 while True:
     # Find all the groups
     groups = DB['group'].find()
-    
     time.sleep(1)
     # Loop through the groups
     for group in groups:
         # Get the group information
-        
+        print(group)
         url = group['url']
         chat_id = group['_id']
         contractId = group['contractId']
         methodId = group['methodId']
         lastTokenID = group['lastTokenID'] if 'lastTokenID' in group and group['lastTokenID'] is not None else None
         
-        if contractId is None or methodId is None or url is None:
+        if contractId is None or methodId is None:
             continue
         
         # Get the last transaction count from the database if it exists else get the initial transaction count from the blockchain
