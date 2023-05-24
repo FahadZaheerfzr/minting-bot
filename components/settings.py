@@ -20,11 +20,11 @@ def changeContractId(message:types.CallbackQuery, bot):
 
     if groupInfo is None:
         bot.reply_to(message, "This community is not registered. Please use /register to register your community.")
-        return settings(message, bot)
+        return settings(message.message, bot)
     
     if groupInfo['owner'] != message.from_user.id:
         bot.reply_to(message, "You are not the owner of this community.")
-        return settings(message, bot)
+        return settings(message.message, bot)
     
     #update the contract id
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -52,11 +52,11 @@ def changeUrl(message:types.CallbackQuery, bot):
 
     if groupInfo is None:
         bot.reply_to(message, "This community is not registered. Please use /register to register your community.")
-        return settings(message, bot)
+        return settings(message.message, bot)
     
     if groupInfo['owner'] != message.from_user.id:
         bot.reply_to(message, "You are not the owner of this community.")
-        return settings(message, bot)
+        return settings(message.message, bot)
     
     #update the url
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -83,11 +83,11 @@ def changeMethodId(message:types.CallbackQuery, bot):
 
     if groupInfo is None:
         bot.reply_to(message, "This community is not registered. Please use /register to register your community.")
-        return settings(message, bot)
+        return settings(message.message, bot)
     
     if groupInfo['owner'] != message.from_user.id:
         bot.reply_to(message, "You are not the owner of this community.")
-        return settings(message, bot)
+        return settings(message.message, bot)
     
     #update the method id
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
