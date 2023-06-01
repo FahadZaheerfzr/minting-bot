@@ -18,6 +18,9 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
         f'{networkConfig.api_url}?module=account&action=txlist&address={contractId}&startblock=0&endblock=999999999&sort=asc&apikey=' + networkConfig.get_api_key())
 
     # Convert the response to JSON
+    if not response:
+        return (transactionCount, None)
+
     response = response.json()
 
     data = sorted(response['result'],
