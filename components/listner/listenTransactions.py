@@ -23,8 +23,12 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
 
     response = response.json()
 
-    data = sorted(response['result'],
-                  key=lambda x: x['timeStamp'], reverse=True)
+    if response is not None:
+        data = sorted(response['result'],
+                      key=lambda x: x['timeStamp'], reverse=True)
+    else:
+        return (transactionCount, None)
+    
     data_length = len(data)
     if data_length <= transactionCount:
         if data_length == 10000:
