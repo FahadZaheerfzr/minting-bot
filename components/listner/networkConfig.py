@@ -17,7 +17,7 @@ class NetworkConfig:
             self.chain_id = 56
         elif self.network == "bsc_testnet":
             self.api_url = "https://api-testnet.bscscan.com/api"
-            self.rpc_url = "https://rpc.ankr.com/bsc_testnet_chapel"
+            self.rpc_url = "https://data-seed-prebsc-1-s1.binance.org:8545/"
             self.chain_id = 97
         else:
             raise ValueError("Invalid network selected.")
