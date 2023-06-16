@@ -24,8 +24,9 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
     response = response.json()
 
     if response is not None:
-        data = sorted(response['result'],
-                      key=lambda x: x['timeStamp'], reverse=True)
+        data = response.get('result')
+        if data is not None:
+            data = sorted(data, key=lambda x: x['timeStamp'], reverse=True)
     else:
         return (transactionCount, None)
     
