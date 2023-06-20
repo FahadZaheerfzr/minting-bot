@@ -9,8 +9,7 @@ def run_script():
 
     while True:
         # Start the script as a subprocess
-        script_process = subprocess.Popen(['python', 'listner.py'],
-                                          stderr=subprocess.PIPE)
+        script_process = subprocess.Popen(['python3', 'listner.py'])
         
         # Wait for the script to finish
         script_process.wait()
