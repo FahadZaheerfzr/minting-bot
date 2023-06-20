@@ -1,21 +1,25 @@
 from config import BOT_TOKEN 
-import telebot # pip install pyTelegramBotAPI
-from components.start import start #import the start function from the start.py file
+import telebot
+import logging
+from components.start import start
 from components.listner.listenTransactions import listener
 from components.database import DB
 from components.listner.helper import getInitialTransactionCount
 import time
 
-mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None) # create a bot object with the bot token we have
+# Configure logging
+logging.basicConfig(filename='transactions.log', level=logging.INFO,
+                    format='%(asctime)s %(levelname)s: %(message)s')
 
-me = mint_bot.get_me() #get the bot information
-print(me.username) #print the bot username
-
+mint_bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None)
+me = mint_bot.get_me()
+print(me.username)
 
 while True:
     # Find all the groups
     groups = DB['group'].find()
     time.sleep(1)
+    
     # Loop through the groups
     for group in groups:
         # Get the group information
@@ -29,16 +33,22 @@ while True:
         if contractId is None or methodId is None:
             continue
         
-        # Get the last transaction count from the database if it exists else get the initial transaction count from the blockchain
-        transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group and group['lastTransactionCount'] is not None else getInitialTransactionCount(contractId, chat_id) - 1        # Call the listener function
+        # Get the last transaction count from the database if it exists, else get the initial transaction count from the blockchain
+        transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group and group['lastTransactionCount'] is not None else getInitialTransactionCount(contractId, chat_id) - 1
+        
+        # Call the listener function
         transactionCount, lastTokenID = listener(transactionCount, mint_bot, chat_id, url, contractId, methodId, lastTokenID)
-
+        
+        # Log the transaction information
+        logging.info(f"Transaction count for chat ID {chat_id}: {transactionCount}")
+        if lastTokenID is not None:
+            logging.info(f"Last token ID for chat ID {chat_id}: {lastTokenID}")
+        
         # Update the last transaction count in the database
         print("Updating the database with the last transaction count: ", transactionCount)
         print("For the group: ", chat_id)
         if lastTokenID is not None:
-            print("Last token id: ", lastTokenID)
+            print("Last token ID: ", lastTokenID)
             DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTransactionCount": transactionCount, "lastTokenID": lastTokenID}})
         else:
             DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTransactionCount": transactionCount}})
-
