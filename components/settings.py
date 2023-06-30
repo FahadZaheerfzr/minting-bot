@@ -164,7 +164,7 @@ def settings(message, bot):
     markup.add(types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId"))
     markup.add(types.InlineKeyboardButton("Change Network", callback_data="changeNetwork"))
 
-    bot.send_message(chat_id, settingFormat(), reply_markup=markup, parse_mode="HTML")
+    bot.send_message(message.from_user.id, settingFormat(), reply_markup=markup, parse_mode="HTML")
 
 def settingFormat():
     return """

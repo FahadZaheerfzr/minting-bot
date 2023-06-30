@@ -3,7 +3,7 @@ In this file we will have the api keys and bot tokens for the bot to work
 '''
 import json
 
-BOT_TOKEN = '6214871219:AAFWHNcZZVA9XWza74Ld-f3P5-sNYeoQEHM'
+BOT_TOKEN = '6323375298:AAEWt_jABfsx7_OB3eS1arf4C11A50SK2Cw'
 API_KEY = '978IQ2RMN1VHGMG3BMJRI5UYSAX8UN5Z7U'
 
 # BSC testnet
