@@ -4,7 +4,10 @@ from config import API_KEY
 from components.listner.helper import getTokenInfo, formattedPost, getNFTs
 from components.listner.networkConfig import NetworkConfig
 from components.database import DB
+import logging
 
+# Configure logging
+logging.basicConfig(filename='message.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastTokenID):
     # get the network from db
@@ -84,8 +87,10 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
 
         # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
         try:
-            bot.send_photo(chat_id=f"{chat_id}", photo=image,
-                           caption=caption, reply_markup=markup, parse_mode='HTML')
+            message = bot.send_photo(chat_id=f"{chat_id}", photo=image,
+                                     caption=caption, reply_markup=markup, parse_mode='HTML')
+            message_id = message.message_id
+            logging.info(f"Message ID for chat ID {chat_id}: {message_id}")
         except Exception as e:
             print(e)
 
