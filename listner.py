@@ -23,6 +23,7 @@ while True:
     # Loop through the groups
     for group in groups:
         # Get the group information
+        print(group)
         url = group['url']
         chat_id = group['_id']
         contractId = group['contractId']
@@ -38,7 +39,8 @@ while True:
         # Call the listener function
         prev_transactionCount = transactionCount  # Store the previous transaction count
         transactionCount, lastTokenID = listener(transactionCount, mint_bot, chat_id, url, contractId, methodId, lastTokenID)
-
+        
+        print(transactionCount, lastTokenID)
         # Log the transaction information if there is a change
         if transactionCount != prev_transactionCount:
             change = transactionCount - prev_transactionCount
