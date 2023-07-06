@@ -90,7 +90,7 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
             message = bot.send_photo(chat_id=f"{chat_id}", photo=image,
                                      caption=caption, reply_markup=markup, parse_mode='HTML')
             message_id = message.message_id
-            logging.info(f"Message ID for chat ID {chat_id}: {message_id}")
+            logging.info(f"Message ID for chat ID {chat_id} and token ID {nft['id']}: {message_id},name:{name},from:{nft['from']}")
         except Exception as e:
             print(e)
 
