@@ -9,7 +9,8 @@ def run_script():
 
     while True:
         # Start the script as a subprocess
-        script_process = subprocess.Popen(['python3', 'listner.py'])
+        script_process = subprocess.Popen(['python3', 'listner.py'],
+                                          stderr=subprocess.PIPE)
         
         # Wait for the script to finish
         script_process.wait()
@@ -19,8 +20,10 @@ def run_script():
             break
         
         # Log the error
-        error_message = script_process.stderr.read().decode('utf-8').strip()
-        logging.error(error_message)
+        stderr = script_process.stderr
+        if stderr is not None:
+            error_message = stderr.read().decode('utf-8').strip()
+            logging.error(error_message)
         
         print("Script stopped. Restarting...")
         time.sleep(5)  # Wait for 5 seconds before restarting

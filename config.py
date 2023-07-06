@@ -7,7 +7,7 @@ BOT_TOKEN = '6214871219:AAFWHNcZZVA9XWza74Ld-f3P5-sNYeoQEHM'
 API_KEY = '978IQ2RMN1VHGMG3BMJRI5UYSAX8UN5Z7U'
 
 # BSC testnet
-RPC_ADDRESS = "https://rpc.ankr.com/bsc_testnet_chapel"
+RPC_ADDRESS = "https://data-seed-prebsc-1-s1.binance.org:8545/"
 
 NFT_ABI = json.loads(
     """
