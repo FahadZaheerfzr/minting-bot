@@ -43,7 +43,7 @@ def changeContractId(message:types.CallbackQuery, bot):
     bot.register_next_step_handler(message.message, setContract, bot, chat_id)
     logging.info(f"User requested to change Contract ID: Chat ID={chat_id}")
 
-def setUrl(message, bot, chat_id):
+def setUrl(message:types.CallbackQuery, bot, chat_id):
     if message.text == "cancel":
         bot.reply_to(message, "Cancelled", reply_markup=types.ReplyKeyboardRemove())
         return settings(message, bot)
@@ -52,7 +52,8 @@ def setUrl(message, bot, chat_id):
 
     # URL validation check
     if not is_valid_url(url):
-        bot.reply_to(message, "Invalid URL format. Please enter a proper URL. e.g. https://google.com")
+        bot.reply_to(message, "Invalid URL format. Please enter a proper URL.")
+        bot.register_next_step_handler(message, setUrl, bot, chat_id)
         return
 
     # Update the URL
