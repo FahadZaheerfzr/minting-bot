@@ -24,7 +24,11 @@ def setContract(message, bot, chat_id):
 
 
 def changeContractId(message:types.CallbackQuery, bot):
-    chat_id = message.message.chat.id
+    data = message.data.split("_")
+    chat_id = data[1]
+    #to int
+    chat_id = int(chat_id)
+
     groupInfo = DB['group'].find_one({"_id": chat_id})
 
     if groupInfo is None:
@@ -65,10 +69,15 @@ def setUrl(message:types.CallbackQuery, bot, chat_id):
 
 
 def changeUrl(message: types.CallbackQuery, bot):
-    chat_id = message.message.chat.id
+    #get callback data
+    data = message.data.split("_")
+    chat_id = data[1]
+    #to int
+    chat_id = int(chat_id)
     groupInfo = DB['group'].find_one({"_id": chat_id})
 
     if groupInfo is None:
+        print("here")
         bot.reply_to(message, "This community is not registered. Please use /register to register your community.")
         return settings(message.message, bot)
 
@@ -111,7 +120,10 @@ def setMethodId(message, bot, chat_id):
 
 
 def changeMethodId(message:types.CallbackQuery, bot):
-    chat_id = message.message.chat.id
+    data = message.data.split("_")
+    chat_id = data[1]
+    #to int
+    chat_id = int(chat_id)
     groupInfo = DB['group'].find_one({"_id": chat_id})
 
     if groupInfo is None:
@@ -132,7 +144,11 @@ def changeMethodId(message:types.CallbackQuery, bot):
 
 
 def changeNetwork(message: types.CallbackQuery, bot):
-    chat_id = message.message.chat.id
+    data = message.data.split("_")
+    chat_id = data[1]
+    #to int
+    chat_id = int(chat_id)
+    print(chat_id)
     group_info = DB['group'].find_one({"_id": chat_id})
 
     if group_info is None:
@@ -150,12 +166,12 @@ def changeNetwork(message: types.CallbackQuery, bot):
                types.InlineKeyboardButton("BSC Testnet", callback_data="network_bsc_testnet"))
     
     bot.send_message(message.from_user.id, "Please select the network you want to use.", reply_markup=markup)
-    bot.register_next_step_handler(message.message, setNetwork, bot)
+    bot.register_next_step_handler(message.message, setNetwork, bot, chat_id)
     logging.info(f"User requested to change Network: Chat ID={chat_id}")
 
 
-def setNetwork(message, bot):
-    chat_id = message.chat.id
+def setNetwork(message, bot, chat_id):
+    print(chat_id)
     group_info = DB['group'].find_one({"_id": chat_id})
 
     if group_info is None:
@@ -183,9 +199,12 @@ def setNetwork(message, bot):
         logging.warning(f"Invalid network selected: Chat ID={chat_id}")
 
 
-def settings(message, bot):
+def manageCommunity(message, bot,selectedCommunity):
     chat_id = message.chat.id
-    group_info = DB['group'].find_one({"_id": chat_id})
+    print(selectedCommunity)
+    selectedCommunity = selectedCommunity.split(" ")[-1][1:-1]
+    
+    group_info = DB['group'].find_one({"_id": int(selectedCommunity)})
 
     if group_info is None:
         bot.reply_to(message, "This community is not registered. Please use /register to register your community.")
@@ -195,16 +214,71 @@ def settings(message, bot):
         bot.reply_to(message, "You are not the owner of this community.")
         return
 
+
     # Create the inline keyboard for settings selection
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("Change URL", callback_data="changeUrl"))
-    markup.add(types.InlineKeyboardButton("Change Contract Id", callback_data="changeContractId"))
-    markup.add(types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId"))
-    markup.add(types.InlineKeyboardButton("Change Network", callback_data="changeNetwork"))
+    markup.add(types.InlineKeyboardButton("Change URL", callback_data="changeUrl_" + str(group_info['_id'])))
+    markup.add(types.InlineKeyboardButton("Change Contract Id", callback_data="changeContractId_" + str(group_info['_id'])))
+    markup.add(types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId_" + str(group_info['_id'])))
+    markup.add(types.InlineKeyboardButton("Change Network", callback_data="changeNetwork_" + str(group_info['_id'])))
 
     bot.send_message(message.from_user.id, settingFormat(), reply_markup=markup, parse_mode="HTML")
 
-    logging.info(f"User accessed settings: Chat ID={chat_id}")
+    logging.info(f"User accessed settings for community: Chat ID={chat_id}, Community ID={group_info['_id']}")
+
+def settings(message, bot):
+    chat_id = message.chat.id
+    groups = DB['group'].find({"owner": message.from_user.id})
+
+    if len(list(groups.clone())) == 0:
+        bot.reply_to(message, "You are not the owner of any community.")
+        return
+
+    communities = []
+    for group in groups:
+        community_name = group["name"]
+        community_id = group["_id"]
+        community_info = f"{community_name} ({community_id})"
+        communities.append(community_info)
+        
+
+    reply_text = "List of owned communities:\n\n"
+    for idx, community in enumerate(communities, 1):
+        reply_text += f"{idx}. {community}\n"
+
+    reply_text += "\nPlease select a community by entering its corresponding number or type 'cancel' to exit."
+
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    for idx in range(1, len(communities) + 1):
+        markup.add(str(idx))
+
+    markup.add("cancel")
+
+    # Store the selected community in selectedCommunity
+    selectedCommunity = None
+
+    def handle_selected_community(message):
+        nonlocal selectedCommunity
+        if message.text == 'cancel':
+            bot.reply_to(message, "Action canceled.")
+            return
+
+        try:
+            selected_index = int(message.text) - 1
+            if 0 <= selected_index < len(communities):
+                selectedCommunity = communities[selected_index]
+                manageCommunity(message, bot, selectedCommunity)
+            else:
+                bot.reply_to(message, "Invalid selection. Please try again.")
+        except ValueError:
+            bot.reply_to(message, "Invalid input. Please try again.")
+
+    bot.send_message(chat_id, reply_text, reply_markup=markup)
+    bot.register_next_step_handler(message, handle_selected_community)
+
+
+
+    
 
 def settingFormat():
     return """
