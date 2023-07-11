@@ -1,1 +1,1 @@
-# minting-bot
+# mint-bot
