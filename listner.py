@@ -42,7 +42,7 @@ while True:
         
         print(transactionCount, lastTokenID)
         # Log the transaction information if there is a change
-        if transactionCount != prev_transactionCount:
+        if transactionCount > prev_transactionCount:
             change = transactionCount - prev_transactionCount
             logging.info(f"Transaction count change for chat ID {chat_id}: {change} (New count: {transactionCount})")
             if lastTokenID is not None:

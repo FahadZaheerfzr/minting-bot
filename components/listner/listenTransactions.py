@@ -39,17 +39,17 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
             return (data_length - 100, None)
         return (data_length, None)
 
-    # Get hashes of all transactions
     hashes = []
     for i in range(data_length-transactionCount):
-        if data[i]['methodId'] == methodId:
+        if i < data_length and data[i]['methodId'] == methodId:
             hashes.append(data[i]['hash'])
 
     # Get the from addresses of all transactions
     froms = []
     for i in range(data_length-transactionCount):
-        if data[i]['from'] not in froms and data[i]['methodId'] == methodId:
-            froms.append(data[i]['from'])
+        if i < data_length and data[i]['methodId'] == methodId:
+            if data[i]['from'] not in froms:
+                froms.append(data[i]['from'])
 
     # To get the token ids
     nftsMinted = getNFTs(froms, hashes, contractId, chat_id)
