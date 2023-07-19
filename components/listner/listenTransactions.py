@@ -11,6 +11,7 @@ logging.basicConfig(filename='message.log', level=logging.INFO, format='%(asctim
 
 def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastTokenID):
     # get the network from db
+    print("The transaction count is: ", transactionCount)
     network = DB['group'].find_one({"_id": chat_id})['network']
 
     # get the network config
@@ -33,9 +34,11 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
     else:
         return (transactionCount, None)
     
+    logging.info(f"The data length for chat ID {chat_id} is {len(data)}")
     data_length = len(data)
     if data_length <= transactionCount:
         if data_length == 10000:
+            logging.warning(f"Transaction count for chat ID {chat_id} is 10000. This is the maximum number of transactions that can be fetched from the API. The last transaction count will be set to 9900.")
             return (data_length - 100, None)
         return (data_length, None)
 
@@ -55,7 +58,10 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
     nftsMinted = getNFTs(froms, hashes, contractId, chat_id)
     for nft in nftsMinted:
         if lastTokenID is not None and int(nft["id"]) <= lastTokenID:
+            print (f"Token ID {nft['id']} has already been processed for chat ID {chat_id}.")
+            logging.info(f"Token ID {nft['id']} has already been processed for chat ID {chat_id}.")
             return
+
         try:
             tokenInfo = getTokenInfo(contractId, int(nft["id"]), chat_id)
         except Exception as e:
@@ -95,6 +101,7 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
             print(e)
 
     if data_length == 10000:
+        logging.warning(f"Transaction count for chat ID {chat_id} is 10000. This is the maximum number of transactions that can be fetched from the API. The last transaction count will be set to 9900.")
         return (data_length - 100, int(nftsMinted[0]["id"]))
 
     return (data_length, None)
