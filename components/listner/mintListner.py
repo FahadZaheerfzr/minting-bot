@@ -6,5 +6,7 @@ response = requests.get(
 )
 
 response = response.json()
+reversed_response = response['result'][::-1]
+print(reversed_response[0]['topics'][3])
 data = response.get('result')
-print(len(data))
+

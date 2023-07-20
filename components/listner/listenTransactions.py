@@ -19,63 +19,36 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
 
     # Make an API call to get the latest minted token
     response = requests.get(
-        f'{networkConfig.api_url}?module=account&action=txlist&address={contractId}&startblock=0&endblock=999999999&sort=asc&apikey=' + networkConfig.get_api_key())
+        f'{networkConfig.api_url}?module=logs&action=getLogs&fromBlock="latest"&toBlock="latest"&address={contractId}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic0_1_opr=and&topic1=0x0000000000000000000000000000000000000000000000000000000000000000&apikey=' + networkConfig.get_api_key())
+    
 
-    # Convert the response to JSON
     if not response:
         return (transactionCount, lastTokenID)
+    
 
     response = response.json()
 
-    if response is not None:
-        data = response.get('result')
-        if data is not None:
-            data = sorted(data, key=lambda x: int(x['timeStamp']), reverse=True)
-
-    else:
+    if (response['status'] == '0'):
         return (transactionCount, lastTokenID)
-    
-    logging.info(f"The data length for chat ID {chat_id} is {len(data)}")
-    data_length = len(data)
-    if data_length <= transactionCount:
-        if data_length == 10000:
-            logging.warning(f"Transaction count for chat ID {chat_id} is 10000. This is the maximum number of transactions that can be fetched from the API. The last transaction count will be set to 9900.")
-            return (data_length - 100, None)
-        return (data_length, lastTokenID)
 
-    hashes = []
+    # sort the response
+    print(len(response['result']))
+    originalLength = len(response['result'])
+    reversed_response = response['result'][transactionCount:]
 
-    for i in range(10):
-        print(data[i])
+    if(len(reversed_response) == 0):
+        return (transactionCount, lastTokenID)
 
-    for i in range(data_length-transactionCount):
-        if i < data_length and data[i]['methodId'] == methodId:
-            hashes.append(data[i]['hash'])
-
-    # Get the from addresses of all transactions
-    froms = []
-    for i in range(data_length-transactionCount):
-        if i < data_length and data[i]['methodId'] == methodId:
-            if data[i]['from'] not in froms:
-                froms.append(data[i]['from'])
-
-    # To get the token ids
-    nftsMinted = getNFTs(froms, hashes, contractId, chat_id)
-    for nft in nftsMinted:
-        print(type(lastTokenID))
-        print(int(nft["id"]))
-        print(int(nft["id"]) <= lastTokenID)
-        if lastTokenID is not None and int(nft["id"]) <= lastTokenID:
-            print (f"Token ID {nft['id']} has already been processed for chat ID {chat_id}.")
-            logging.info(f"Token ID {nft['id']} has already been processed for chat ID {chat_id}.")
-            return (data_length, lastTokenID)
-
-        try:
-            tokenInfo = getTokenInfo(contractId, int(nft["id"]), chat_id)
-        except Exception as e:
-            print(e)
-            continue
-
+    data_length = len(reversed_response)
+    print (data_length)
+    latestTokenId = reversed_response[0]['topics'][3]
+    # we will loop as many as the difference and get token info for each new token
+    for i in range(data_length):
+        # get the token id
+        tokenId = reversed_response[i]['topics'][3]
+        # get the token info
+        tokenInfo = getTokenInfo(contractId, int(tokenId,16), chat_id)
+        # get the token image
         try:
             image = requests.get(tokenInfo['tokenURI']).json()['image']
         except:
@@ -94,22 +67,20 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
         # Create the formatted message
         if maxSupply == "Infinity":
             caption = formattedPost(
-                name, nft["id"], nft["from"], totalSupply, "Infinity", nft["timestamp"])
+                name, int(tokenId,16), reversed_response[i]['address'], totalSupply, "Infinity", reversed_response[i]['timeStamp'])
         else:
             caption = formattedPost(
-                name, nft["id"], nft["from"], maxSupply-totalSupply, maxSupply, nft["timestamp"])
+                name,int(tokenId,16), reversed_response[i]['address'], maxSupply-totalSupply, maxSupply, reversed_response[i]['timeStamp'])
 
         # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
         try:
             message = bot.send_photo(chat_id=f"{chat_id}", photo=image,
-                                     caption=caption, reply_markup=markup, parse_mode='HTML')
+                                    caption=caption, reply_markup=markup, parse_mode='HTML')
             message_id = message.message_id
-            logging.info(f"Message ID for chat ID {chat_id} and token ID {nft['id']}: {message_id},name:{name},from:{nft['from']}")
+            logging.info(f"Message ID for chat ID {chat_id} and token ID {tokenId}: {message_id},name:{name},from:{reversed_response[i]['address']}")
         except Exception as e:
             print(e)
+    return (originalLength, latestTokenId)
+    
 
-    if data_length == 10000:
-        logging.warning(f"Transaction count for chat ID {chat_id} is 10000. This is the maximum number of transactions that can be fetched from the API. The last transaction count will be set to 9900.")
-        return (data_length - 100, int(nftsMinted[0]["id"]))
 
-    return (data_length, lastTokenID)
