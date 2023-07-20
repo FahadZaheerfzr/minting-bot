@@ -23,16 +23,17 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
 
     # Convert the response to JSON
     if not response:
-        return (transactionCount, None)
+        return (transactionCount, lastTokenID)
 
     response = response.json()
 
     if response is not None:
         data = response.get('result')
         if data is not None:
-            data = sorted(data, key=lambda x: x['timeStamp'], reverse=True)
+            data = sorted(data, key=lambda x: int(x['timeStamp']), reverse=True)
+
     else:
-        return (transactionCount, None)
+        return (transactionCount, lastTokenID)
     
     logging.info(f"The data length for chat ID {chat_id} is {len(data)}")
     data_length = len(data)
@@ -40,9 +41,13 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
         if data_length == 10000:
             logging.warning(f"Transaction count for chat ID {chat_id} is 10000. This is the maximum number of transactions that can be fetched from the API. The last transaction count will be set to 9900.")
             return (data_length - 100, None)
-        return (data_length, None)
+        return (data_length, lastTokenID)
 
     hashes = []
+
+    for i in range(10):
+        print(data[i])
+
     for i in range(data_length-transactionCount):
         if i < data_length and data[i]['methodId'] == methodId:
             hashes.append(data[i]['hash'])
@@ -57,10 +62,13 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
     # To get the token ids
     nftsMinted = getNFTs(froms, hashes, contractId, chat_id)
     for nft in nftsMinted:
+        print(type(lastTokenID))
+        print(int(nft["id"]))
+        print(int(nft["id"]) <= lastTokenID)
         if lastTokenID is not None and int(nft["id"]) <= lastTokenID:
             print (f"Token ID {nft['id']} has already been processed for chat ID {chat_id}.")
             logging.info(f"Token ID {nft['id']} has already been processed for chat ID {chat_id}.")
-            return
+            return (data_length, lastTokenID)
 
         try:
             tokenInfo = getTokenInfo(contractId, int(nft["id"]), chat_id)
@@ -104,4 +112,4 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
         logging.warning(f"Transaction count for chat ID {chat_id} is 10000. This is the maximum number of transactions that can be fetched from the API. The last transaction count will be set to 9900.")
         return (data_length - 100, int(nftsMinted[0]["id"]))
 
-    return (data_length, None)
+    return (data_length, lastTokenID)
