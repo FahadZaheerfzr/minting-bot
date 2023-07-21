@@ -200,9 +200,9 @@ def setNetwork(message, bot, chat_id):
 
 
 def manageCommunity(message, bot,selectedCommunity):
-    chat_id = message.chat.id
-    print(selectedCommunity)
-    selectedCommunity = selectedCommunity.split(" ")[-1][1:-1]
+    chat_id = message.from_user.id
+    print(selectedCommunity, "selectedCommunity")
+    # selectedCommunity = selectedCommunity.split(" ")[-1][1:-1]
     
     group_info = DB['group'].find_one({"_id": int(selectedCommunity)})
 
@@ -221,10 +221,30 @@ def manageCommunity(message, bot,selectedCommunity):
     markup.add(types.InlineKeyboardButton("Change Contract Id", callback_data="changeContractId_" + str(group_info['_id'])))
     markup.add(types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId_" + str(group_info['_id'])))
     markup.add(types.InlineKeyboardButton("Change Network", callback_data="changeNetwork_" + str(group_info['_id'])))
+    markup.add(types.InlineKeyboardButton("Remove this community", callback_data="removeCommunity_" + str(group_info['_id'])))
 
     bot.send_message(message.from_user.id, settingFormat(), reply_markup=markup, parse_mode="HTML")
 
     logging.info(f"User accessed settings for community: Chat ID={chat_id}, Community ID={group_info['_id']}")
+
+def removeCommunity(message, bot):
+    data = message.data.split("_")
+    chat_id = data[1]
+    #to int
+    chat_id = int(chat_id)
+    group_info = DB['group'].find_one({"_id": chat_id})
+
+    if group_info is None:
+        bot.send_message(message.from_user.id, "This community is not registered. Please use /register to register your community.")
+        return
+
+    if group_info['owner'] != message.from_user.id:
+        bot.send_message(message.from_user.id, "You are not the owner of this community.")
+        return
+
+    DB['group'].delete_one({"_id": chat_id})
+    bot.send_message(message.from_user.id, "Community removed successfully", reply_markup=types.ReplyKeyboardRemove())
+    logging.info(f"Community removed: Chat ID={chat_id}, Community ID={group_info['_id']}")
 
 def settings(message, bot):
     chat_id = message.chat.id
@@ -247,38 +267,38 @@ def settings(message, bot):
         reply_text += f"{idx}. {community}\n"
 
     reply_text += "\nPlease select a community by entering its corresponding number or type 'cancel' to exit."
-
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    markup = types.InlineKeyboardMarkup()
     for idx in range(1, len(communities) + 1):
-        markup.add(str(idx))
+        markup.add(types.InlineKeyboardButton(str(communities[idx - 1]), callback_data="handleSelectedCommunity_" + str(communities[idx - 1])))
 
-    markup.add("cancel")
+
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="handleSelectedCommunity_cancel"))
 
     # Store the selected community in selectedCommunity
     selectedCommunity = None
-
-    def handle_selected_community(message):
-        nonlocal selectedCommunity
-        if message.text == 'cancel':
-            bot.reply_to(message, "Action canceled.")
-            return
-
-        try:
-            selected_index = int(message.text) - 1
-            if 0 <= selected_index < len(communities):
-                selectedCommunity = communities[selected_index]
-                manageCommunity(message, bot, selectedCommunity)
-            else:
-                bot.reply_to(message, "Invalid selection. Please try again.")
-        except ValueError:
-            bot.reply_to(message, "Invalid input. Please try again.")
-
-    bot.send_message(chat_id, reply_text, reply_markup=markup)
-    bot.register_next_step_handler(message, handle_selected_community)
+    print(message.text)
 
 
+    bot.send_message(message.from_user.id, settingFormat(), reply_markup=markup, parse_mode="HTML")
+    # bot.register_next_step_handler(message, handleSelectedCommunity)
 
+def handleSelectedCommunity(message: types.CallbackQuery,bot):
+    data = message.data.split("_")
+    selectedCommunity = data[1].split(" ")[-1][1:-1]
     
+    if selectedCommunity == 'ance':
+        bot.send_message(message.from_user.id, "Action canceled.")
+        return 
+
+    try:
+        manageCommunity(message, bot, selectedCommunity)
+
+    except ValueError:
+        bot.send_message(message.from_user.id, "Invalid input. Please try again.")
+
+def cancel(message, bot):
+    bot.send_message(message.from_user.id, "Action canceled.")
+    return
 
 def settingFormat():
     return """
