@@ -116,5 +116,5 @@ def formattedPost(name, id, from_address, consumed, max, timestamp):
     🟩 <b>{name} #{id}</b> has been minted \n
 <code>Minter</code>: {from_address}\n
 <code>NFTs left</code>: <b> {consumed} / {max}</b>\n
-<code>Timestamp</code>: {timestampFormatted} +UTC\n
+<code>Timestamp</code>: {timestampFormatted} UTC\n
     """
