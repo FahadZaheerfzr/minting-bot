@@ -23,24 +23,26 @@ while True:
     # Loop through the groups
     for group in groups:
         # Get the group information
-        print(group)
         url = group['url']
         chat_id = group['_id']
         contractId = group['contractId']
         methodId = group['methodId']
         lastTokenID = group['lastTokenID'] if 'lastTokenID' in group and group['lastTokenID'] is not None else None
-
         if contractId is None or methodId is None:
             continue
+        if group["name"] is not None:
+            print(group["name"] + " has " + str(group["lastTransactionCount"]) + " transactions")
 
         # Get the last transaction count from the database if it exists, else get the initial transaction count from the blockchain
-        transactionCount = group['lastTransactionCount'] if 'lastTransactionCount' in group and group['lastTransactionCount'] is not None else getInitialTransactionCount(contractId, chat_id) - 1
-
+        print(group['lastTransactionCount'])
+        if group['lastTransactionCount'] is not None:
+            transactionCount = group['lastTransactionCount']
+        else:
+            transactionCount = getInitialTransactionCount(contractId, methodId)
         # Call the listener function
         prev_transactionCount = transactionCount  # Store the previous transaction count
         transactionCount, lastTokenID = listener(transactionCount, mint_bot, chat_id, url, contractId, methodId, lastTokenID)
         
-        print(transactionCount, lastTokenID)
         # Log the transaction information if there is a change
         if transactionCount > prev_transactionCount:
             change = transactionCount - prev_transactionCount

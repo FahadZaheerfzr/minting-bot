@@ -110,9 +110,11 @@ def getNFTs(froms, hashes, contractId, chat_id):
 
 
 def formattedPost(name, id, from_address, consumed, max, timestamp):
+    timeInSeconds = int(timestamp, 16)
+    timestampFormatted = datetime.fromtimestamp(timeInSeconds)
     return f"""
     🟩 <b>{name} #{id}</b> has been minted \n
 <code>Minter</code>: {from_address}\n
 <code>NFTs left</code>: <b> {consumed} / {max}</b>\n
-<code>Timestamp</code>: {timestamp} +UTC\n
+<code>Timestamp</code>: {timestampFormatted} +UTC\n
     """

@@ -11,7 +11,6 @@ logging.basicConfig(filename='message.log', level=logging.INFO, format='%(asctim
 
 def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastTokenID):
     # get the network from db
-    print("The transaction count is: ", transactionCount)
     network = DB['group'].find_one({"_id": chat_id})['network']
 
     # get the network config
@@ -32,7 +31,6 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
         return (transactionCount, lastTokenID)
 
     # sort the response
-    print(len(response['result']))
     originalLength = len(response['result'])
     reversed_response = response['result'][transactionCount:]
 
@@ -40,7 +38,6 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
         return (transactionCount, lastTokenID)
 
     data_length = len(reversed_response)
-    print (data_length)
     latestTokenId = reversed_response[0]['topics'][3]
     # we will loop as many as the difference and get token info for each new token
     for i in range(data_length):
