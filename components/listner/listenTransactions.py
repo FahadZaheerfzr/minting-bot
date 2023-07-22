@@ -1,7 +1,7 @@
 from telebot import types
 import requests
 from config import API_KEY
-from components.listner.helper import getTokenInfo, formattedPost, getNFTs
+from components.listner.helper import getTokenInfo, formattedPost
 from components.listner.networkConfig import NetworkConfig
 from components.database import DB
 import logging
@@ -16,6 +16,8 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
     # get the network config
     networkConfig = NetworkConfig(network)
 
+    
+
     # Make an API call to get the latest minted token
     response = requests.get(
         f'{networkConfig.api_url}?module=logs&action=getLogs&fromBlock="latest"&toBlock="latest"&address={contractId}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic0_1_opr=and&topic1=0x0000000000000000000000000000000000000000000000000000000000000000&apikey=' + networkConfig.get_api_key())
@@ -23,8 +25,9 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
 
     if not response:
         return (transactionCount, lastTokenID)
-    
-
+    print("From db: ", lastTokenID)
+    intTokenId = int(lastTokenID,16)
+    print("The last tokenId is: ", intTokenId)
     response = response.json()
 
     if (response['status'] == '0'):
@@ -32,15 +35,16 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
 
     # sort the response
     originalLength = len(response['result'])
-    reversed_response = response['result'][transactionCount:]
+    reversed_response = response['result'][::-1]
 
-    if(len(reversed_response) == 0):
-        return (transactionCount, lastTokenID)
-
-    data_length = len(reversed_response)
     latestTokenId = reversed_response[0]['topics'][3]
+    print("difference: ", int(latestTokenId,16) - intTokenId)
+
+
+    if (int(latestTokenId,16) - intTokenId) == 0:
+        return (transactionCount, lastTokenID)
     # we will loop as many as the difference and get token info for each new token
-    for i in range(data_length):
+    for i in range(int(latestTokenId,16) - intTokenId):
         # get the token id
         tokenId = reversed_response[i]['topics'][3]
         # get the token info
@@ -76,6 +80,7 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
             message_id = message.message_id
             logging.info(f"Message ID for chat ID {chat_id} and token ID {tokenId}: {message_id},name:{name},from:{reversed_response[i]['address']}")
         except Exception as e:
+            logging.error(f"Error sending message for chat ID {chat_id} and token ID {tokenId}: {e}")
             print(e)
     return (originalLength, latestTokenId)
     

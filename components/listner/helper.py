@@ -82,31 +82,31 @@ def getTokenInfo(tokenAddress, tokenId, chat_id):
     }
 
 
-def getNFTs(froms, hashes, contractId, chat_id):
-    # get the network from db
-    network = DB['group'].find_one({"_id": chat_id})['network']
+# def getNFTs(froms, hashes, contractId, chat_id):
+#     # get the network from db
+#     network = DB['group'].find_one({"_id": chat_id})['network']
 
-    # get the network config
-    networkConfig = NetworkConfig(network)
+#     # get the network config
+#     networkConfig = NetworkConfig(network)
 
-    nftsMinted = []
-    for i in range(len(froms)):
-        transactions = requests.get(
-            f'{networkConfig.api_url}?module=account&action=tokennfttx&contractaddress={contractId}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={networkConfig.get_api_key()}')
-        transactions = transactions.json()
-        if transactions['result']:  # check if 'result' is not empty
-            for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):
-                if (tx['hash'] in hashes):
-                    nftsMinted.append(
-                        {
-                            'id': tx['tokenID'],
-                            'from': froms[i],
-                            'timestamp': datetime.fromtimestamp(int(tx['timeStamp']))
-                        }
-                    )
-    nftsMinted.reverse()
+#     nftsMinted = []
+#     for i in range(len(froms)):
+#         transactions = requests.get(
+#             f'{networkConfig.api_url}?module=account&action=tokennfttx&contractaddress={contractId}&address={froms[i]}&page=1&offset=100&sort=asc&apikey={networkConfig.get_api_key()}')
+#         transactions = transactions.json()
+#         if transactions['result']:  # check if 'result' is not empty
+#             for tx in sorted(transactions['result'], key=lambda x: x['timeStamp'], reverse=True):
+#                 if (tx['hash'] in hashes):
+#                     nftsMinted.append(
+#                         {
+#                             'id': tx['tokenID'],
+#                             'from': froms[i],
+#                             'timestamp': datetime.fromtimestamp(int(tx['timeStamp']))
+#                         }
+#                     )
+#     nftsMinted.reverse()
 
-    return nftsMinted
+#     return nftsMinted
 
 
 def formattedPost(name, id, from_address, consumed, max, timestamp):
