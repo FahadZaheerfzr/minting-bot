@@ -4,7 +4,7 @@ import logging
 from components.start import start
 from components.listner.listenTransactions import listener
 from components.database import DB
-from components.listner.helper import getInitialTransactionCount
+from components.listner.helper import getInitialTransactionCount, getInitialTokenId
 import time
 
 # Configure logging
@@ -31,27 +31,20 @@ while True:
         if contractId is None or methodId is None:
             continue
         if group["name"] is not None:
-            print(group["name"] + " has " + str(group["lastTransactionCount"]) + " transactions")
+            print(group["name"] + " has " + str(group["lastTokenID"]) + " token ID")
 
         # Get the last transaction count from the database if it exists, else get the initial transaction count from the blockchain
-        print(group['lastTransactionCount'])
-        if group['lastTransactionCount'] is not None:
-            transactionCount = group['lastTransactionCount']
+        if lastTokenID is not None:
+            lastTokenID = group['lastTokenID']
         else:
-            transactionCount = getInitialTransactionCount(contractId, methodId)
-        # Call the listener function
-        prev_transactionCount = transactionCount  # Store the previous transaction count
-        transactionCount, lastTokenID = listener(transactionCount, mint_bot, chat_id, url, contractId, methodId, lastTokenID)
+            lastTokenID = getInitialTokenId(contractId, chat_id) - 2
         
-        # Log the transaction information if there is a change
-        if transactionCount > prev_transactionCount:
-            change = transactionCount - prev_transactionCount
-            logging.info(f"Transaction count change for chat ID {chat_id}: {change} (New count: {transactionCount})")
-            if lastTokenID is not None:
-                logging.info(f"Last token ID for chat ID {chat_id}: {lastTokenID}")
-
+        print(lastTokenID)
+        
+        # Call the listener function
+        lastTokenID = listener(mint_bot, chat_id, url, contractId, methodId, lastTokenID)
+        
+        
         # Update the last transaction count in the database
         if lastTokenID is not None:
-            DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTransactionCount": transactionCount, "lastTokenID": lastTokenID}})
-        else:
-            DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTransactionCount": transactionCount}})
+            DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTokenID": lastTokenID}})

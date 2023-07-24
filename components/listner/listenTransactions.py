@@ -9,7 +9,7 @@ import logging
 # Configure logging
 logging.basicConfig(filename='message.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
-def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastTokenID):
+def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     # get the network from db
     network = DB['group'].find_one({"_id": chat_id})['network']
 
@@ -24,32 +24,37 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
     
 
     if not response:
-        return (transactionCount, lastTokenID)
+        return (lastTokenID)
+    
     print("From db: ", lastTokenID)
-    intTokenId = int(lastTokenID,16)
+    intTokenId = lastTokenID
     print("The last tokenId is: ", intTokenId)
     response = response.json()
 
     if (response['status'] == '0'):
-        return (transactionCount, lastTokenID)
+        return (lastTokenID)
 
     # sort the response
     originalLength = len(response['result'])
     reversed_response = response['result'][::-1]
 
-    latestTokenId = reversed_response[0]['topics'][3]
-    print("difference: ", int(latestTokenId,16) - intTokenId)
+    latestTokenId = int(reversed_response[0]['topics'][3],16)
+    print(latestTokenId)
+    print(intTokenId)
+    print("difference: ", latestTokenId - intTokenId)
 
 
-    if (int(latestTokenId,16) - intTokenId) == 0:
-        return (transactionCount, lastTokenID)
+    if (latestTokenId - intTokenId) == 0:
+        return (lastTokenID)
+    
     # we will loop as many as the difference and get token info for each new token
-    for i in range(int(latestTokenId,16) - intTokenId):
+    for i in range(latestTokenId - intTokenId):
         # get the token id
         tokenId = reversed_response[i]['topics'][3]
         # get the token info
         tokenInfo = getTokenInfo(contractId, int(tokenId,16), chat_id)
         # get the token image
+        print(tokenInfo['tokenURI'])
         try:
             image = requests.get(tokenInfo['tokenURI']).json()['image']
         except:
@@ -82,7 +87,7 @@ def listener(transactionCount, bot, chat_id, url, contractId, methodId, lastToke
         except Exception as e:
             logging.error(f"Error sending message for chat ID {chat_id} and token ID {tokenId}: {e}")
             print(e)
-    return (originalLength, latestTokenId)
+    return latestTokenId
     
 
 

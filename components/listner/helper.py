@@ -19,6 +19,7 @@ def getInitialTransactionCount(contractAddress: str, chat_id: int):
     # Parameters for the API call
     start_block = 0
     end_block = 999999999
+    print(chat_id)
 
     # get the network from db
     network = DB['group'].find_one({"_id": chat_id})['network']
@@ -38,6 +39,18 @@ def getInitialTransactionCount(contractAddress: str, chat_id: int):
     print("Initial transaction count: ", data_length)
 
     return data_length
+
+
+def getInitialTokenId(contractAddress: str, chat_id: int):
+    network = DB['group'].find_one({"_id": chat_id})['network']
+    networkConfig = NetworkConfig(network)
+    response = requests.get(
+        f'{networkConfig.api_url}?module=logs&action=getLogs&fromBlock="latest"&toBlock="latest"&address={contractAddress}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic0_1_opr=and&topic1=0x0000000000000000000000000000000000000000000000000000000000000000&apikey=' + networkConfig.get_api_key())
+
+    # Convert the response to JSON
+    response = response.json()
+    
+    return int(response['result'][-1]['topics'][3], 16)
 
 
 def getTokenInfo(tokenAddress, tokenId, chat_id):
