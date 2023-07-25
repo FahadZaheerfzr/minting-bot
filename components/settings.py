@@ -16,12 +16,11 @@ def setContract(message, bot, chat_id):
         return settings(message, bot)
 
     # Update the contract id
-    DB['group'].update_one({"_id": chat_id}, {"$set": {"contractId": message.text, "lastTransactionCount": None}})
-    bot.reply_to(message, "Contract ID updated successfully", reply_markup=types.ReplyKeyboardRemove())
+    DB['group'].update_one({"_id": chat_id}, {"$set": {"contractId": message.text, "lastTokenID": None}})
+    bot.reply_to(message, "Contract ID updated successfully. Please update the network accordingly", reply_markup=types.ReplyKeyboardRemove())
 
     # Log the setting change
     logging.info(f"Contract ID updated: Chat ID={chat_id}, New Contract ID={message.text}")
-
 
 def changeContractId(message:types.CallbackQuery, bot):
     data = message.data.split("_")

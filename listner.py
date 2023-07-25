@@ -38,8 +38,10 @@ while True:
             lastTokenID = group['lastTokenID']
             
         else:
-            lastTokenID = getInitialTokenId(contractId, chat_id) - 2
-        
+            try:
+                lastTokenID = getInitialTokenId(contractId, chat_id) - 2
+            except:
+                continue
         
         # Call the listener function
         lastTokenID = listener(mint_bot, chat_id, url, contractId, methodId, lastTokenID)

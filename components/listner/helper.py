@@ -48,8 +48,14 @@ def getInitialTokenId(contractAddress: str, chat_id: int):
         f'{networkConfig.api_url}?module=logs&action=getLogs&fromBlock="latest"&toBlock="latest"&address={contractAddress}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic0_1_opr=and&topic1=0x0000000000000000000000000000000000000000000000000000000000000000&apikey=' + networkConfig.get_api_key())
 
     # Convert the response to JSON
+    if response is None:
+        return None
+    
     response = response.json()
     
+    if response['result'] == []:
+        return None
+    print(response['result'])
     return int(response['result'][-1]['topics'][3], 16)
 
 
