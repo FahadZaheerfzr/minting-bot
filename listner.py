@@ -36,10 +36,10 @@ while True:
         # Get the last transaction count from the database if it exists, else get the initial transaction count from the blockchain
         if lastTokenID is not None:
             lastTokenID = group['lastTokenID']
+            
         else:
             lastTokenID = getInitialTokenId(contractId, chat_id) - 2
         
-        print(lastTokenID)
         
         # Call the listener function
         lastTokenID = listener(mint_bot, chat_id, url, contractId, methodId, lastTokenID)

@@ -12,7 +12,6 @@ logging.basicConfig(filename='message.log', level=logging.INFO, format='%(asctim
 def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     # get the network from db
     network = DB['group'].find_one({"_id": chat_id})['network']
-
     # get the network config
     networkConfig = NetworkConfig(network)
 
@@ -24,6 +23,7 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     
 
     if not response:
+        print("not response")
         return (lastTokenID)
     
     print("From db: ", lastTokenID)
@@ -32,6 +32,7 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     response = response.json()
 
     if (response['status'] == '0'):
+        print("status 0")
         return (lastTokenID)
 
     # sort the response
@@ -45,11 +46,18 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
 
 
     if (latestTokenId - intTokenId) == 0:
+        print("no new token")
         return (lastTokenID)
     
+    reversed_response = reversed_response[:latestTokenId - intTokenId]
+    # now reverse it again
+    reversed_response = reversed_response[::-1]
+
     # we will loop as many as the difference and get token info for each new token
+
     for i in range(latestTokenId - intTokenId):
         # get the token id
+        
         tokenId = reversed_response[i]['topics'][3]
         # get the token info
         tokenInfo = getTokenInfo(contractId, int(tokenId,16), chat_id)
