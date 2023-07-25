@@ -52,7 +52,7 @@ def getInitialTokenId(contractAddress: str, chat_id: int):
         return None
     
     response = response.json()
-    
+
     if response['result'] == []:
         return None
     print(response['result'])
@@ -136,4 +136,7 @@ def formattedPost(name, id, from_address, consumed, max, timestamp):
 <code>Minter</code>: {from_address}\n
 <code>NFTs left</code>: <b> {consumed} / {max}</b>\n
 <code>Timestamp</code>: {timestampFormatted} UTC\n
+Created by <a href="https://roburna.com/">Roburna Labs</a>
+
+Ad: <a href="https://rbascan.com/">RBAScan</a>
     """
