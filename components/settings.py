@@ -202,7 +202,7 @@ def manageCommunity(message, bot,selectedCommunity):
     chat_id = message.from_user.id
     print(selectedCommunity, "selectedCommunity")
     # selectedCommunity = selectedCommunity.split(" ")[-1][1:-1]
-    
+    logging.info(f"Manage community: Chat ID={chat_id}, Community ID={selectedCommunity}")
     group_info = DB['group'].find_one({"_id": int(selectedCommunity)})
 
     if group_info is None:
@@ -284,12 +284,13 @@ def settings(message, bot):
 def handleSelectedCommunity(message: types.CallbackQuery,bot):
     data = message.data.split("_")
     selectedCommunity = data[1].split(" ")[-1][1:-1]
-    
+    print(selectedCommunity,"handleSelectedCommunity")
     if selectedCommunity == 'ance':
         bot.send_message(message.from_user.id, "Action canceled.")
         return 
 
     try:
+        logging.info(f"handleSelectedCommunity:Community ID={selectedCommunity}")
         manageCommunity(message, bot, selectedCommunity)
 
     except ValueError:
