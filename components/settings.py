@@ -264,6 +264,8 @@ def settings(message, bot):
     reply_text = "List of owned communities:\n\n"
     for idx, community in enumerate(communities, 1):
         reply_text += f"{idx}. {community}\n"
+    print(communities)
+    logging.info(f"User Communities: Chat ID={chat_id}, Communities={communities}")
 
     reply_text += "\nPlease select a community by entering its corresponding number or type 'cancel' to exit."
     markup = types.InlineKeyboardMarkup()
@@ -283,6 +285,8 @@ def settings(message, bot):
 
 def handleSelectedCommunity(message: types.CallbackQuery,bot):
     data = message.data.split("_")
+    print(data)
+    logging.info(f"User selected data: data={data}")
     selectedCommunity = data[1].split(" ")[-1][1:-1]
     print(selectedCommunity,"handleSelectedCommunity")
     if selectedCommunity == 'ance':
