@@ -13,7 +13,7 @@ def register(message: types.Message, bot: TeleBot):
             "methodId": "0xa0712d68",
             "network": "bsc_testnet",
         })
-        bot.reply_to(message, "Group Registered, Use /settings to manage it")
+        bot.reply_to(message, "Group registered, use the command /settings in my dm to manage your mintbot")
     except Exception as e:
-        bot.reply_to(message, "This community is already registered. Please use /settings to configure your community.")
+        bot.reply_to(message, "This community is already registered. Please use /settings in my dm to configure your community.")
     

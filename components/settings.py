@@ -218,7 +218,7 @@ def manageCommunity(message, bot,selectedCommunity):
     markup = types.InlineKeyboardMarkup()
     markup.add(types.InlineKeyboardButton("Change URL", callback_data="changeUrl_" + str(group_info['_id'])))
     markup.add(types.InlineKeyboardButton("Change Contract Id", callback_data="changeContractId_" + str(group_info['_id'])))
-    markup.add(types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId_" + str(group_info['_id'])))
+    #markup.add(types.InlineKeyboardButton("Change Method Id", callback_data="changeMethodId_" + str(group_info['_id'])))
     markup.add(types.InlineKeyboardButton("Change Network", callback_data="changeNetwork_" + str(group_info['_id'])))
     markup.add(types.InlineKeyboardButton("Remove this community", callback_data="removeCommunity_" + str(group_info['_id'])))
 
@@ -280,7 +280,7 @@ def settings(message, bot):
     print(message.text)
 
 
-    bot.send_message(message.from_user.id, settingFormat(), reply_markup=markup, parse_mode="HTML")
+    bot.send_message(message.from_user.id, settingFormatCommunity(), reply_markup=markup, parse_mode="HTML")
     # bot.register_next_step_handler(message, handleSelectedCommunity)
 
 def handleSelectedCommunity(message: types.CallbackQuery,bot):
@@ -306,5 +306,11 @@ def cancel(message, bot):
 
 def settingFormat():
     return """
-<b>Please select the setting you want to change:</b>
+<b> Please select the option you wish to change:</b>
+"""
+
+
+def settingFormatCommunity():
+    return """
+<b> Please select the community you wish to set up the mintbot:</b>
 """
