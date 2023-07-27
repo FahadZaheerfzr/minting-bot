@@ -270,7 +270,7 @@ def settings(message, bot):
     reply_text += "\nPlease select a community by entering its corresponding number or type 'cancel' to exit."
     markup = types.InlineKeyboardMarkup()
     for idx in range(1, len(communities) + 1):
-        markup.add(types.InlineKeyboardButton(str(communities[idx - 1]), callback_data="handleSelectedCommunity_" + str(communities[idx - 1])))
+        markup.add(types.InlineKeyboardButton(str(communities[idx - 1]), callback_data="handleSelectedCommunity|" + str(communities[idx - 1])))
 
 
     markup.add(types.InlineKeyboardButton("cancel", callback_data="handleSelectedCommunity_cancel"))
@@ -284,7 +284,7 @@ def settings(message, bot):
     # bot.register_next_step_handler(message, handleSelectedCommunity)
 
 def handleSelectedCommunity(message: types.CallbackQuery,bot):
-    data = message.data.split("_")
+    data = message.data.split("|")
     print(data)
     logging.info(f"User selected data: data={data}")
     selectedCommunity = data[1].split(" ")[-1][1:-1]

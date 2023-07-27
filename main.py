@@ -13,7 +13,7 @@ mint_bot.register_message_handler(register, pass_bot=True, commands=['register']
 mint_bot.register_message_handler(settings, pass_bot=True, commands=['settings'])
 mint_bot.register_message_handler(cancel, pass_bot=True, commands=['cancel'])
 
-mint_bot.register_callback_query_handler(handleSelectedCommunity, pass_bot=True, func=lambda call: call.data.startswith('handleSelectedCommunity_'))
+mint_bot.register_callback_query_handler(handleSelectedCommunity, pass_bot=True, func=lambda call: call.data.startswith('handleSelectedCommunity|'))
 mint_bot.register_callback_query_handler(changeUrl, pass_bot=True, func=lambda call: call.data.startswith('changeUrl_'))
 mint_bot.register_callback_query_handler(changeContractId, pass_bot=True, func=lambda call: call.data.startswith('changeContractId_'))
 mint_bot.register_callback_query_handler(changeMethodId, pass_bot=True, func=lambda call: call.data.startswith('changeMethodId_'))
