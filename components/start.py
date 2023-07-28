@@ -28,28 +28,22 @@ def startFormat():
         None
     """
 
-    return """Hi! I'm <b>RBAmintbot</b>. I respond to the following commands:\n
-/register - Register your community\n
-/settings - Change your community settings\n
-\n<b>Here is how to set me up:</b>\n
-1. Use /register to register your community\n
-2. Use /settings to change your community settings\n
+    return """
+Hi! I'm <b>RBAmintbot</b>. Let's get started: \n
 
-<b>In settings, you can configure the following:</b>
+<b>Here's how to set me up:</b> \n
+Add me to your community and make me an admin. \n
+Send the command /register in your community. \n
+Send the command /settings to me to set up your mint bot. \n
 
-<b>Change URL</b>: Change the URL of the community.
+<b>In settings, you can configure the following: </b> \n
+<b>Change URL</b>: Update the community URL. \n
+<b>Change Contract ID</b>: Modify the NFT contract ID in the blockchain. \n
+<b>Change Network</b>: Switch between ETH Mainnet, BSC Mainnet, and BSC Testnet. \n
 
-<b>Change Contract ID</b>: Change the contract ID of the NFT. 
-- This is the ID of the NFT contract in the blockchain.
+<b>NOTE:</b> You can only use /settings if you are the owner of the community. \n
 
-<b>Change Method ID</b>: Change the method ID of the NFT. 
-- This is the ID of the method in the NFT contract.
+Please note, I am in beta version, so errors, issues, and omissions are possible! \n
 
-<b>Change Network</b>: Change the network of the community. 
-- Currently, the bot supports <b>ETH Mainnet</b>, <b>BSC Mainnet</b>, and <b>BSC Testnet</b>.
-
-<b>NOTE:</b> You can only use /settings if you are the owner of the community.
-
-Please note, I am a beta version. Errors, issues and omissions are possible!\n
-<code>Created by @RBAminbot</code>
+<code>Created by @Roburna </code>
 """
