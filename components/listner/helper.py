@@ -19,7 +19,6 @@ def getInitialTransactionCount(contractAddress: str, chat_id: int):
     # Parameters for the API call
     start_block = 0
     end_block = 999999999
-    print(chat_id)
 
     # get the network from db
     network = DB['group'].find_one({"_id": chat_id})['network']
@@ -36,7 +35,6 @@ def getInitialTransactionCount(contractAddress: str, chat_id: int):
 
     data_length = len(response['result'])
 
-    print("Initial transaction count: ", data_length)
 
     return data_length
 
@@ -55,7 +53,6 @@ def getInitialTokenId(contractAddress: str, chat_id: int):
 
     if response['result'] == []:
         return None
-    print(response['result'])
     return int(response['result'][-1]['topics'][3], 16)
 
 
@@ -79,26 +76,29 @@ def getTokenInfo(tokenAddress, tokenId, chat_id):
     web3 = Web3(Web3.HTTPProvider(networkConfig.rpc_url))
 
     # Create the contract object
-    tokenContract = web3.eth.contract(address=tokenAddress, abi=NFT_ABI)
-    erc_contract = web3.eth.contract(address=tokenAddress, abi=ERC_ABI)
-
-    name = erc_contract.functions.name().call()
-    # Get the token info
     try:
-        maxSupply = tokenContract.functions.maxSupply().call()
+        tokenContract = web3.eth.contract(address=tokenAddress, abi=NFT_ABI)
+        erc_contract = web3.eth.contract(address=tokenAddress, abi=ERC_ABI)
+
+        name = erc_contract.functions.name().call()
+        # Get the token info
+        try:
+            maxSupply = tokenContract.functions.maxSupply().call()
+        except:
+            maxSupply = "Infinity"
+
+        tokenURI = tokenContract.functions.tokenURI(tokenId).call()
+        totalSupply = tokenContract.functions.totalSupply().call()
+
+        # Return the token info
+        return {
+            "name": name,
+            "maxSupply": maxSupply,
+            "tokenURI": tokenURI,
+            "totalSupply": totalSupply
+        }
     except:
-        maxSupply = "Infinity"
-
-    tokenURI = tokenContract.functions.tokenURI(tokenId).call()
-    totalSupply = tokenContract.functions.totalSupply().call()
-
-    # Return the token info
-    return {
-        "name": name,
-        "maxSupply": maxSupply,
-        "tokenURI": tokenURI,
-        "totalSupply": totalSupply
-    }
+        return None
 
 
 # def getNFTs(froms, hashes, contractId, chat_id):

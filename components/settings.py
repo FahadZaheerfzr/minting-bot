@@ -76,7 +76,6 @@ def changeUrl(message: types.CallbackQuery, bot):
     groupInfo = DB['group'].find_one({"_id": chat_id})
 
     if groupInfo is None:
-        print("here")
         bot.reply_to(message, "This community is not registered. Please use /register to register your community.")
         return settings(message.message, bot)
 
@@ -147,7 +146,6 @@ def changeNetwork(message: types.CallbackQuery, bot):
     chat_id = data[1]
     #to int
     chat_id = int(chat_id)
-    print(chat_id)
     group_info = DB['group'].find_one({"_id": chat_id})
 
     if group_info is None:
@@ -170,7 +168,6 @@ def changeNetwork(message: types.CallbackQuery, bot):
 
 
 def setNetwork(message, bot, chat_id):
-    print(chat_id)
     group_info = DB['group'].find_one({"_id": chat_id})
 
     if group_info is None:
@@ -200,7 +197,6 @@ def setNetwork(message, bot, chat_id):
 
 def manageCommunity(message, bot,selectedCommunity):
     chat_id = message.from_user.id
-    print(selectedCommunity, "selectedCommunity")
     # selectedCommunity = selectedCommunity.split(" ")[-1][1:-1]
     logging.info(f"Manage community: Chat ID={chat_id}, Community ID={selectedCommunity}")
     group_info = DB['group'].find_one({"_id": int(selectedCommunity)})
@@ -264,7 +260,6 @@ def settings(message, bot):
     reply_text = "List of owned communities:\n\n"
     for idx, community in enumerate(communities, 1):
         reply_text += f"{idx}. {community}\n"
-    print(communities)
     logging.info(f"User Communities: Chat ID={chat_id}, Communities={communities}")
 
     reply_text += "\nPlease select a community by entering its corresponding number or type 'cancel' to exit."
@@ -277,7 +272,6 @@ def settings(message, bot):
 
     # Store the selected community in selectedCommunity
     selectedCommunity = None
-    print(message.text)
 
 
     bot.send_message(message.from_user.id, settingFormatCommunity(), reply_markup=markup, parse_mode="HTML")
@@ -285,10 +279,8 @@ def settings(message, bot):
 
 def handleSelectedCommunity(message: types.CallbackQuery,bot):
     data = message.data.split("|")
-    print(data)
     logging.info(f"User selected data: data={data}")
     selectedCommunity = data[1].split(" ")[-1][1:-1]
-    print(selectedCommunity,"handleSelectedCommunity")
     if selectedCommunity == 'ance':
         bot.send_message(message.from_user.id, "Action canceled.")
         return 

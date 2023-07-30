@@ -30,8 +30,7 @@ while True:
         lastTokenID = group['lastTokenID'] if 'lastTokenID' in group and group['lastTokenID'] is not None else None
         if contractId is None or methodId is None:
             continue
-        if group["name"] is not None:
-            print(group["name"] + " has " + str(group["lastTokenID"]) + " token ID")
+
 
         # Get the last transaction count from the database if it exists, else get the initial transaction count from the blockchain
         if lastTokenID is not None:

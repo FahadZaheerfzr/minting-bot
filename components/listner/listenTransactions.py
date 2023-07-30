@@ -23,16 +23,12 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     
 
     if not response:
-        print("not response")
         return (lastTokenID)
     
-    print("From db: ", lastTokenID)
     intTokenId = lastTokenID
-    print("The last tokenId is: ", intTokenId)
     response = response.json()
 
     if (response['status'] == '0'):
-        print("status 0")
         return (lastTokenID)
 
     # sort the response
@@ -40,13 +36,9 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     reversed_response = response['result'][::-1]
 
     latestTokenId = int(reversed_response[0]['topics'][3],16)
-    print(latestTokenId)
-    print(intTokenId)
-    print("difference: ", latestTokenId - intTokenId)
 
 
     if (latestTokenId - intTokenId) == 0:
-        print("no new token")
         return (lastTokenID)
     
     reversed_response = reversed_response[:latestTokenId - intTokenId]
@@ -61,8 +53,10 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
         tokenId = reversed_response[i]['topics'][3]
         # get the token info
         tokenInfo = getTokenInfo(contractId, int(tokenId,16), chat_id)
+
+        if tokenInfo is None:
+            continue
         # get the token image
-        print(tokenInfo['tokenURI'])
         try:
             image = requests.get(tokenInfo['tokenURI']).json()['image']
         except:
@@ -94,7 +88,6 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
             logging.info(f"Message ID for chat ID {chat_id} and token ID {tokenId}: {message_id},name:{name},from:{reversed_response[i]['address']}")
         except Exception as e:
             logging.error(f"Error sending message for chat ID {chat_id} and token ID {tokenId}: {e}")
-            print(e)
     return latestTokenId
     
 
