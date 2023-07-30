@@ -34,7 +34,6 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     # sort the response
     originalLength = len(response['result'])
     reversed_response = response['result'][::-1]
-    print(reversed_response)
     latestTokenId = int(reversed_response[0]['topics'][3],16)
     from_address = reversed_response[0]['topics'][2]
     from_address = from_address.replace("000000000000000000000000","")
