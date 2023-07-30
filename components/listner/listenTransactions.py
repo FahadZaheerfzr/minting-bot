@@ -34,17 +34,16 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     # sort the response
     originalLength = len(response['result'])
     reversed_response = response['result'][::-1]
-
+    print(reversed_response)
     latestTokenId = int(reversed_response[0]['topics'][3],16)
-
+    from_address = reversed_response[0]['topics'][2]
+    from_address = from_address.replace("000000000000000000000000","")
 
     if (latestTokenId - intTokenId) == 0:
         return (lastTokenID)
-    
     reversed_response = reversed_response[:latestTokenId - intTokenId]
     # now reverse it again
     reversed_response = reversed_response[::-1]
-
     # we will loop as many as the difference and get token info for each new token
 
     for i in range(latestTokenId - intTokenId):
@@ -75,10 +74,10 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
         # Create the formatted message
         if maxSupply == "Infinity":
             caption = formattedPost(
-                name, int(tokenId,16), reversed_response[i]['address'], totalSupply, "Infinity", reversed_response[i]['timeStamp'])
+                name, int(tokenId,16), from_address, totalSupply, "Infinity", reversed_response[i]['timeStamp'])
         else:
             caption = formattedPost(
-                name,int(tokenId,16), reversed_response[i]['address'], maxSupply-totalSupply, maxSupply, reversed_response[i]['timeStamp'])
+                name,int(tokenId,16), from_address, maxSupply-totalSupply, maxSupply, reversed_response[i]['timeStamp'])
 
         # Send the message with the image and button, and the inline keyboard with the "Mint here!" button
         try:
