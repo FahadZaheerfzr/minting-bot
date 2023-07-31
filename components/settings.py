@@ -199,6 +199,7 @@ def manageCommunity(message, bot,selectedCommunity):
     chat_id = message.from_user.id
     # selectedCommunity = selectedCommunity.split(" ")[-1][1:-1]
     logging.info(f"Manage community: Chat ID={chat_id}, Community ID={selectedCommunity}")
+    selectedCommunity=float(selectedCommunity)
     group_info = DB['group'].find_one({"_id": int(selectedCommunity)})
 
     if group_info is None:
