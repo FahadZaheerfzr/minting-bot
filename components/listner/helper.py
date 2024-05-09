@@ -27,8 +27,12 @@ def getInitialTransactionCount(contractAddress: str, chat_id: int):
     networkConfig = NetworkConfig(network)
 
     # Make an API call to get the latest minted token
-    response = requests.get(
-        f'{networkConfig.api_url}?module=account&action=txlist&address={contractAddress}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + networkConfig.get_api_key())
+    if network == "roburna_mainnet":
+        response = requests.get(
+            f'{networkConfig.api_url}?module=account&action=txlist&address={contractAddress}')
+    else:
+        response = requests.get(
+            f'{networkConfig.api_url}?module=account&action=txlist&address={contractAddress}&startblock={start_block}&endblock={end_block}&sort=asc&apikey=' + networkConfig.get_api_key())
 
     # Convert the response to JSON
     response = response.json()
@@ -42,8 +46,14 @@ def getInitialTransactionCount(contractAddress: str, chat_id: int):
 def getInitialTokenId(contractAddress: str, chat_id: int):
     network = DB['group'].find_one({"_id": chat_id})['network']
     networkConfig = NetworkConfig(network)
-    response = requests.get(
-        f'{networkConfig.api_url}?module=logs&action=getLogs&fromBlock="latest"&toBlock="latest"&address={contractAddress}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic0_1_opr=and&topic1=0x0000000000000000000000000000000000000000000000000000000000000000&apikey=' + networkConfig.get_api_key())
+
+    if network == "roburna_mainnet":
+        response = requests.get(
+            f'{networkConfig.api_url}?module=logs&action=getLogs&fromBlock="latest"&toBlock="latest"&address={contractAddress}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic0_1_opr=and&topic1=0x0000000000000000000000000000000000000000000000000000000000000000'
+        )
+    else:
+        response = requests.get(
+            f'{networkConfig.api_url}?module=logs&action=getLogs&fromBlock="latest"&toBlock="latest"&address={contractAddress}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic0_1_opr=and&topic1=0x0000000000000000000000000000000000000000000000000000000000000000&apikey=' + networkConfig.get_api_key())
 
     # Convert the response to JSON
     if response is None:

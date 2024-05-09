@@ -160,7 +160,8 @@ def changeNetwork(message: types.CallbackQuery, bot):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(types.InlineKeyboardButton("ETH Mainnet", callback_data="network_eth_mainnet"),
                types.InlineKeyboardButton("BSC Mainnet", callback_data="network_bsc_mainnet"),
-               types.InlineKeyboardButton("BSC Testnet", callback_data="network_bsc_testnet"))
+               types.InlineKeyboardButton("BSC Testnet", callback_data="network_bsc_testnet"),
+               types.InlineKeyboardButton("Roburna Mainnet", callback_data="network_roburna_mainnet"))
     
     bot.send_message(message.from_user.id, "Please select the network you want to use.", reply_markup=markup)
     bot.register_next_step_handler(message.message, setNetwork, bot, chat_id)
@@ -190,6 +191,10 @@ def setNetwork(message, bot, chat_id):
         DB['group'].update_one({"_id": chat_id}, {"$set": {"network": "bsc_testnet"}})
         bot.reply_to(message, "Network updated successfully", reply_markup=types.ReplyKeyboardRemove())
         logging.info(f"Network updated: Chat ID={chat_id}, New Network=BSC Testnet")
+    elif message.text == "Roburna Mainnet":
+        DB['group'].update_one({"_id": chat_id}, {"$set": {"network": "roburna_mainnet"}})
+        bot.reply_to(message, "Network updated successfully", reply_markup=types.ReplyKeyboardRemove())
+        logging.info(f"Network updated: Chat ID={chat_id}, New Network=Roburna Mainnet")
     else:
         bot.reply_to(message, "Invalid network selected", reply_markup=types.ReplyKeyboardRemove())
         logging.warning(f"Invalid network selected: Chat ID={chat_id}")
