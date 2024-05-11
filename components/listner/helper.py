@@ -49,7 +49,7 @@ def getInitialTokenId(contractAddress: str, chat_id: int):
 
     if network == "roburna_mainnet":
         response = requests.get(
-            f'{networkConfig.api_url}?module=logs&action=getLogs&fromBlock="latest"&toBlock="latest"&address={contractAddress}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic0_1_opr=and&topic1=0x0000000000000000000000000000000000000000000000000000000000000000'
+            f'{networkConfig.api_url}/addresses/{contractAddress}/logs'
         )
     else:
         response = requests.get(
@@ -60,10 +60,47 @@ def getInitialTokenId(contractAddress: str, chat_id: int):
         return None
     
     response = response.json()
+    if network == "roburna_mainnet":
+        if response['items']==[]:
+            return None
+        return int(response['items'][0]['topics'][3],16)
+    else:
+        if response['result'] == []:
+            return None
+        return int(response['result'][-1]['topics'][3], 16)
 
-    if response['result'] == []:
+def getTokenInfoRoburna(tokenAddress, tokenId, chat_id):
+    '''
+    This function returns the token info, but as nft for roburna abi doesnt have appropriate functions, we will call an api
+    https://rbascan.com/api/v2/tokens/0x08b2632289Ac79a12A70FBc7306B5614992F7090/instances/1
+
+    Args:
+        tokenAddress (str): The token address
+        tokenId (int): The token id
+
+    Returns:
+        dict: The token info
+    '''
+    # get the network from db
+    network = DB['group'].find_one({"_id": chat_id})['network']
+
+    # get the network config
+    networkConfig = NetworkConfig(network)
+
+    try:
+        response = requests.get(
+            f'{networkConfig.api_url}/tokens/{tokenAddress}/instances/{tokenId}'
+        )
+        response = response.json()
+        return {
+            "name": response['metadata']['name'],
+            "maxSupply": "Infinity",
+            "tokenURI": response['image_url'],
+            "totalSupply": response['token']['total_supply']
+        }
+    except Exception as e:
+        print(e)
         return None
-    return int(response['result'][-1]['topics'][3], 16)
 
 
 def getTokenInfo(tokenAddress, tokenId, chat_id):
@@ -107,7 +144,8 @@ def getTokenInfo(tokenAddress, tokenId, chat_id):
             "tokenURI": tokenURI,
             "totalSupply": totalSupply
         }
-    except:
+    except Exception as e:
+        print(e)
         return None
 
 
@@ -138,9 +176,16 @@ def getTokenInfo(tokenAddress, tokenId, chat_id):
 #     return nftsMinted
 
 
-def formattedPost(name, id, from_address, consumed, max, timestamp):
-    timeInSeconds = int(timestamp, 16)
-    timestampFormatted = datetime.fromtimestamp(timeInSeconds)
+def formattedPost(name, id, from_address, consumed, max, timestamp,network):
+    # for roburna timestamp is like this:2024-05-11T06:00:45.000000Z'
+    if network == "roburna_mainnet":
+        # convert to integer
+        timeInSeconds = datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%fZ")
+        timestampFormatted = timeInSeconds
+    else:
+        timeInSeconds = int(timestamp, 16)
+        timestampFormatted = datetime.fromtimestamp(timeInSeconds)
+
     return f"""
     🟩 <b>{name} #{id}</b> has been minted \n
 <code>Minter</code>: {from_address}\n
