@@ -34,7 +34,7 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     intTokenId = lastTokenID
     response = response.json()
 
-
+    # print(response)
     if (network != "roburna_mainnet" and response['status'] == "0"):
         return (lastTokenID)
     elif (network == "roburna_mainnet" and response['items'] == []):
@@ -58,8 +58,9 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     if network == "roburna_mainnet":
         # remove any items that have topic[3] null
         response['items'] = [item for item in response['items'] if item['topics'][3] is not None]
-        reversed_response = response['items'][::-1]
+        reversed_response = response['items']
         reversed_response = reversed_response[:latestTokenId - intTokenId]
+        print(reversed_response)
     else:
         reversed_response = reversed_response[:latestTokenId - intTokenId]
         # now reverse it again
@@ -69,14 +70,16 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
     for i in range(latestTokenId - intTokenId):
         # get the token id
         try:
+            
             tokenId = reversed_response[i]['topics'][3]
+            print(tokenId)
             # get the token info
             if network == "roburna_mainnet":
                 tokenInfo = getTokenInfoRoburna (contractId, int(tokenId,16), chat_id)
             else:
                 tokenInfo = getTokenInfo(contractId, int(tokenId,16), chat_id)
         except Exception as e:
-            print (e)
+            print (f"Error here: {e}")
             continue
         if tokenInfo is None:
             continue

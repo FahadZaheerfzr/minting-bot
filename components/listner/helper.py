@@ -83,7 +83,7 @@ def getTokenInfoRoburna(tokenAddress, tokenId, chat_id):
     '''
     # get the network from db
     network = DB['group'].find_one({"_id": chat_id})['network']
-
+    print(tokenId)
     # get the network config
     networkConfig = NetworkConfig(network)
 
@@ -92,13 +92,15 @@ def getTokenInfoRoburna(tokenAddress, tokenId, chat_id):
             f'{networkConfig.api_url}/tokens/{tokenAddress}/instances/{tokenId}'
         )
         response = response.json()
+        print(response)
         return {
-            "name": response['metadata']['name'],
+            "name": response['token']['name'],
             "maxSupply": "Infinity",
             "tokenURI": response['image_url'],
             "totalSupply": response['token']['total_supply']
         }
     except Exception as e:
+        print("Error in getTokenInfoRoburna")
         print(e)
         return None
 
