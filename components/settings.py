@@ -40,7 +40,7 @@ def changeContractId(message:types.CallbackQuery, bot):
     
     # Update the contract id
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel"))
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
 
     bot.send_message(message.from_user.id, "Please enter your contract id.", reply_markup=markup)
     bot.register_next_step_handler(message.message, setContract, bot, chat_id)
@@ -85,7 +85,7 @@ def changeUrl(message: types.CallbackQuery, bot):
 
     # Update the URL
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel"))
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
 
     bot.send_message(message.from_user.id, "Please enter your URL.", reply_markup=markup)
     bot.register_next_step_handler(message.message, setUrl, bot, chat_id)
@@ -134,7 +134,7 @@ def changeMethodId(message:types.CallbackQuery, bot):
     
     # Update the method id
     markup = types.InlineKeyboardMarkup()
-    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel"))
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
 
     bot.send_message(message.from_user.id, "Please enter your method id.", reply_markup=markup)
     bot.register_next_step_handler(message.message, setMethodId, bot, chat_id)
@@ -274,7 +274,7 @@ def settings(message, bot):
         markup.add(types.InlineKeyboardButton(str(communities[idx - 1]), callback_data="handleSelectedCommunity|" + str(communities[idx - 1])))
 
 
-    markup.add(types.InlineKeyboardButton("cancel", callback_data="handleSelectedCommunity_cancel"))
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
 
     # Store the selected community in selectedCommunity
     selectedCommunity = None
