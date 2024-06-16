@@ -19,9 +19,9 @@ mint_bot.register_callback_query_handler(changeContractId, pass_bot=True, func=l
 mint_bot.register_callback_query_handler(changeMethodId, pass_bot=True, func=lambda call: call.data.startswith('changeMethodId_'))
 mint_bot.register_callback_query_handler(changeNetwork, pass_bot=True, func=lambda call: call.data.startswith('changeNetwork_'))
 mint_bot.register_callback_query_handler(removeCommunity, pass_bot=True, func=lambda call: call.data.startswith('removeCommunity_'))
-mint_bot.register_callback_query_handler(cancel, pass_bot=True, func=lambda call: call.data.startswith('cancel_'))
-mint_bot.register_callback_query_handler(register, pass_bot=True, func=lambda call: call.data.startswith('register_'))
-mint_bot.register_callback_query_handler(settings, pass_bot=True, func=lambda call: call.data.startswith('settings_'))
+mint_bot.register_callback_query_handler(cancel, pass_bot=True, func=lambda call: call.data.startswith('cancel'))
+mint_bot.register_callback_query_handler(register, pass_bot=True, func=lambda call: call.data.startswith('register'))
+mint_bot.register_callback_query_handler(settings, pass_bot=True, func=lambda call: call.data.startswith('settings'))
 me = mint_bot.get_me() #get the bot information
 print(me.username) #print the bot username
 mint_bot.polling() #start the bot
