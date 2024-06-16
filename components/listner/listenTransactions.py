@@ -19,7 +19,6 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
 
     # Make an API call to get the latest minted token
     if network == "roburna_mainnet":
-                
         response = requests.get(
             f'{networkConfig.api_url}/addresses/{contractId}/logs'
         )

@@ -39,7 +39,7 @@ def changeContractId(message:types.CallbackQuery, bot):
         return settings(message.message, bot)
     
     # Update the contract id
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup = types.InlineKeyboardButton(resize_keyboard=True)
     markup.add("cancel")
 
     bot.send_message(message.from_user.id, "Please enter your contract id.", reply_markup=markup)
@@ -84,7 +84,7 @@ def changeUrl(message: types.CallbackQuery, bot):
         return settings(message.message, bot)
 
     # Update the URL
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup = types.InlineKeyboardButton(resize_keyboard=True)
     markup.add("cancel")
 
     bot.send_message(message.from_user.id, "Please enter your URL.", reply_markup=markup)
@@ -133,7 +133,7 @@ def changeMethodId(message:types.CallbackQuery, bot):
         return settings(message.message, bot)
     
     # Update the method id
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    markup = types.InlineKeyboardButton(resize_keyboard=True)
     markup.add("cancel")
 
     bot.send_message(message.from_user.id, "Please enter your method id.", reply_markup=markup)
