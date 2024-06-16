@@ -14,7 +14,7 @@ def start(message, bot):
     """
 
     # Create a menu with two buttons: "Register" and "Settings"
-    menu = types.InlineKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+    menu = types.InlineKeyboardMarkup()
     menu.row(types.KeyboardButton('/register'), types.KeyboardButton('/settings') )
     menu.row(types.KeyboardButton('/cancel'))
     # Send the menu to the user
