@@ -312,3 +312,8 @@ def settingFormatCommunity():
     return """
 <b> Please select the community you wish to set up the mintbot:</b>
 """
+
+
+def cancel_callback(message, bot):
+    bot.send_message(message.from_user.id, "Action canceled.")
+    return
