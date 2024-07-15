@@ -19,6 +19,11 @@ class NetworkConfig:
             self.api_url = "https://api-testnet.bscscan.com/api"
             self.rpc_url = "https://data-seed-prebsc-1-s1.binance.org:8545/"
             self.chain_id = 97
+        elif self.network == "roburna_mainnet":
+            self.api_url = "https://rbascan.com/api/v2"
+            self.rpc_url = "https://dataseed.roburna.com"
+            self.chain_id = 158
+
         else:
             raise ValueError("Invalid network selected.")
 

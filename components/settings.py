@@ -39,8 +39,8 @@ def changeContractId(message:types.CallbackQuery, bot):
         return settings(message.message, bot)
     
     # Update the contract id
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add("cancel")
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
 
     bot.send_message(message.from_user.id, "Please enter your contract id.", reply_markup=markup)
     bot.register_next_step_handler(message.message, setContract, bot, chat_id)
@@ -84,8 +84,8 @@ def changeUrl(message: types.CallbackQuery, bot):
         return settings(message.message, bot)
 
     # Update the URL
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add("cancel")
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
 
     bot.send_message(message.from_user.id, "Please enter your URL.", reply_markup=markup)
     bot.register_next_step_handler(message.message, setUrl, bot, chat_id)
@@ -133,8 +133,8 @@ def changeMethodId(message:types.CallbackQuery, bot):
         return settings(message.message, bot)
     
     # Update the method id
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add("cancel")
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
 
     bot.send_message(message.from_user.id, "Please enter your method id.", reply_markup=markup)
     bot.register_next_step_handler(message.message, setMethodId, bot, chat_id)
@@ -160,7 +160,8 @@ def changeNetwork(message: types.CallbackQuery, bot):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup.add(types.InlineKeyboardButton("ETH Mainnet", callback_data="network_eth_mainnet"),
                types.InlineKeyboardButton("BSC Mainnet", callback_data="network_bsc_mainnet"),
-               types.InlineKeyboardButton("BSC Testnet", callback_data="network_bsc_testnet"))
+               types.InlineKeyboardButton("BSC Testnet", callback_data="network_bsc_testnet"),
+               types.InlineKeyboardButton("Roburna Mainnet", callback_data="network_roburna_mainnet"))
     
     bot.send_message(message.from_user.id, "Please select the network you want to use.", reply_markup=markup)
     bot.register_next_step_handler(message.message, setNetwork, bot, chat_id)
@@ -190,6 +191,10 @@ def setNetwork(message, bot, chat_id):
         DB['group'].update_one({"_id": chat_id}, {"$set": {"network": "bsc_testnet"}})
         bot.reply_to(message, "Network updated successfully", reply_markup=types.ReplyKeyboardRemove())
         logging.info(f"Network updated: Chat ID={chat_id}, New Network=BSC Testnet")
+    elif message.text == "Roburna Mainnet":
+        DB['group'].update_one({"_id": chat_id}, {"$set": {"network": "roburna_mainnet"}})
+        bot.reply_to(message, "Network updated successfully", reply_markup=types.ReplyKeyboardRemove())
+        logging.info(f"Network updated: Chat ID={chat_id}, New Network=Roburna Mainnet")
     else:
         bot.reply_to(message, "Invalid network selected", reply_markup=types.ReplyKeyboardRemove())
         logging.warning(f"Invalid network selected: Chat ID={chat_id}")
@@ -269,7 +274,7 @@ def settings(message, bot):
         markup.add(types.InlineKeyboardButton(str(communities[idx - 1]), callback_data="handleSelectedCommunity|" + str(communities[idx - 1])))
 
 
-    markup.add(types.InlineKeyboardButton("cancel", callback_data="handleSelectedCommunity_cancel"))
+    markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
 
     # Store the selected community in selectedCommunity
     selectedCommunity = None
@@ -307,3 +312,8 @@ def settingFormatCommunity():
     return """
 <b> Please select the community you wish to set up the mintbot:</b>
 """
+
+
+def cancel_callback(message, bot):
+    bot.send_message(message.from_user.id, "Action canceled.")
+    return
