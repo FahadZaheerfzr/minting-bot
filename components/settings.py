@@ -256,11 +256,13 @@ def settings(message, bot):
         return
 
     communities = []
+    communities_names = []
     for group in groups:
         community_name = group["name"]
         community_id = group["_id"]
-        community_info = f"{community_name} ({community_id})"
+        community_info = f"{community_id}"
         communities.append(community_info)
+        communities_names.append(community_name)
         
 
     reply_text = "List of owned communities:\n\n"
@@ -271,7 +273,7 @@ def settings(message, bot):
     reply_text += "\nPlease select a community by entering its corresponding number or type 'cancel' to exit."
     markup = types.InlineKeyboardMarkup()
     for idx in range(1, len(communities) + 1):
-        markup.add(types.InlineKeyboardButton(str(communities[idx - 1]), callback_data="handleSelectedCommunity|" + str(communities[idx - 1])))
+        markup.add(types.InlineKeyboardButton(str(communities_names[idx - 1]) if communities_names[idx-1] else 'Personal DM', callback_data="handleSelectedCommunity|" + str(communities[idx - 1])))
 
 
     markup.add(types.InlineKeyboardButton("cancel", callback_data="cancel_"))
@@ -286,8 +288,8 @@ def settings(message, bot):
 def handleSelectedCommunity(message: types.CallbackQuery,bot):
     data = message.data.split("|")
     logging.info(f"User selected data: data={data}")
-    selectedCommunity = data[1].split(" ")[-1][1:-1]
-    if selectedCommunity == 'ance':
+    selectedCommunity = data[1]
+    if selectedCommunity == 'cancel':
         bot.send_message(message.from_user.id, "Action canceled.")
         return 
 
