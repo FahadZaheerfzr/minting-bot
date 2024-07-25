@@ -51,4 +51,4 @@ while True:
             try:
                 DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTokenID": lastTokenID}})
             except Exception as e:
-                reportError(mint_bot, f"Error updating lastTokenID in the database, lastTokenId is {lastTokenID} and error is {e}")
+                reportError(mint_bot, f"Error updating lastTokenID in the database, lastTokenId is {lastTokenID} for chat_id {chat_id} and error is {e}")
