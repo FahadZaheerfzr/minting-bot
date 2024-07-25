@@ -197,3 +197,16 @@ Created by <a href="https://roburna.com/">Roburna Labs</a>
 
 Ad: <a href="https://rbascan.com/">RBAScan</a>
     """
+
+
+def reportError(bot, errorMessage):
+    '''
+    This function sends an error message to the user
+    Args:
+        bot (TelegramBot): The Telegram bot object
+        errorMessage (str): The error message
+    '''
+    bot.send_message(
+        chat_id=-1002185998188,
+        text=f"An error occurred: {errorMessage}"
+    )

@@ -1,7 +1,7 @@
 from telebot import types
 import requests
 from config import API_KEY
-from components.listner.helper import getTokenInfo, formattedPost,getTokenInfoRoburna
+from components.listner.helper import getTokenInfo, formattedPost,getTokenInfoRoburna, reportError
 from components.listner.networkConfig import NetworkConfig
 from components.database import DB
 import logging
@@ -79,6 +79,8 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
                 tokenInfo = getTokenInfo(contractId, int(tokenId,16), chat_id)
         except Exception as e:
             print (f"Error here: {e}")
+            reportError(bot, f"Error getting token info for token ID {tokenId} in chat ID {chat_id}, error: {e}")
+            
             continue
         if tokenInfo is None:
             continue
@@ -86,7 +88,11 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
         try:
             image = requests.get(tokenInfo['tokenURI']).json()['image']
         except:
-            image = requests.get(tokenInfo['tokenURI']+".jpg").content
+            try:
+                image = requests.get(tokenInfo['tokenURI']+".jpg").content
+            except:
+                reportError(bot, f"Error getting image for token ID {tokenId} in chat ID {chat_id}, tokenURI is: {tokenInfo['tokenURI']}")
+                continue
 
         maxSupply = tokenInfo['maxSupply']
         totalSupply = tokenInfo['totalSupply']
@@ -128,6 +134,7 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
                 message_id = message.message_id
                 logging.info(f"Message ID for chat ID {chat_id} and token ID {tokenId}: {message_id},name:{name},from:{reversed_response[i]['address']}")
             except Exception as e:
+                reportError(bot, f"Error sending message for chat ID {chat_id} and token ID {tokenId}: {e}")
                 logging.error(f"Error sending message for chat ID {chat_id} and token ID {tokenId}: {e}")
                 continue
             logging.error(f"Error sending message for chat ID {chat_id} and token ID {tokenId}: {e}")
