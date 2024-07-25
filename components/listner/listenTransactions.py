@@ -44,7 +44,7 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
         # sort the response
         if network == "roburna_mainnet":
             originalLength = len (response['items'])
-            latestTokenId = int(response['items'][0]['topics'][3],16)  
+            latestTokenId = int(response['items'][0]['topics'][3],16)
             from_address = response['items'][0]['topics'][2]
             from_address = from_address.replace("000000000000000000000000","")  
         else:
@@ -56,22 +56,25 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
 
         if (latestTokenId - intTokenId) == 0:
             return (lastTokenID)
+        
+        if (latestTokenId - intTokenId) > 100:
+            return lastTokenID
+
         if network == "roburna_mainnet":
             # remove any items that have topic[3] null
             response['items'] = [item for item in response['items'] if item['topics'][3] is not None]
             reversed_response = response['items']
             reversed_response = reversed_response[:latestTokenId - intTokenId]
-            print(reversed_response)
         else:
             reversed_response = reversed_response[:latestTokenId - intTokenId]
             # now reverse it again
             reversed_response = reversed_response[::-1]
         # we will loop as many as the difference and get token info for each new token
-
+        print("Difference is: ",latestTokenId - intTokenId)
         for i in range(latestTokenId - intTokenId):
             # get the token id
             try:
-                
+                print(i)
                 tokenId = reversed_response[i]['topics'][3]
                 print(tokenId)
                 # get the token info
