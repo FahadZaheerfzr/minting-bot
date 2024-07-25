@@ -38,11 +38,13 @@ while True:
             
         else:
             try:
+                
                 lastTokenID = getInitialTokenId(contractId, chat_id) - 2
             except:
                 continue
         
         # Call the listener function
+        print(lastTokenID)
         lastTokenID = listener(mint_bot, chat_id, url, contractId, methodId, lastTokenID)
         
         
