@@ -4,7 +4,7 @@ import logging
 from components.start import start
 from components.listner.listenTransactions import listener
 from components.database import DB
-from components.listner.helper import getInitialTransactionCount, getInitialTokenId
+from components.listner.helper import getInitialTransactionCount, getInitialTokenId, reportError
 import time
 
 # Configure logging
@@ -48,4 +48,7 @@ while True:
         
         # Update the last transaction count in the database
         if lastTokenID is not None:
-            DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTokenID": lastTokenID}})
+            try:
+                DB['group'].update_one({"_id": chat_id}, {"$set": {"lastTokenID": lastTokenID}})
+            except Exception as e:
+                reportError(mint_bot, f"Error updating lastTokenID in the database, lastTokenId is {lastTokenID} and error is {e}", chat_id)
