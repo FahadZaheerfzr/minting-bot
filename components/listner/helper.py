@@ -91,11 +91,14 @@ def getTokenInfoRoburna(tokenAddress, tokenId, chat_id):
         response = requests.get(
             f'{networkConfig.api_url}/tokens/{tokenAddress}/instances/{tokenId}'
         )
+        # https://rbascan.com/api/v2/tokens/0xE6688739A8E6e4bbF4343E2FA6939A8C9dE001b5/instances/1
         response = response.json()
         print(response)
+        # get maxsupply from nft abi
+        maxSupply = getMaxSupplyRoburna(tokenAddress, tokenId, chat_id)
         return {
             "name": response['token']['name'],
-            "maxSupply": "Infinity",
+            "maxSupply": maxSupply,
             "tokenURI": response['image_url'],
             "totalSupply": response['token']['total_supply']
         }
@@ -149,6 +152,23 @@ def getTokenInfo(tokenAddress, tokenId, chat_id):
     except Exception as e:
         print(e)
         return None
+    
+def getMaxSupplyRoburna(tokenAddress, tokenId, chat_id):
+    # get the network from db
+    network = DB['group'].find_one({"_id": chat_id})['network']
+    # get the network config
+    networkConfig = NetworkConfig(network)
+    web3 = Web3(Web3.HTTPProvider(networkConfig.rpc_url))
+    try:
+        tokenContract = web3.eth.contract(address=tokenAddress, abi=NFT_ABI)
+        maxSupply = tokenContract.functions.maxSupply().call()
+        return maxSupply
+    except Exception as e:
+        print(e)
+        return None
+    
+
+    
 
 
 # def getNFTs(froms, hashes, contractId, chat_id):
