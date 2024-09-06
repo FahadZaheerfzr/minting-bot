@@ -83,7 +83,6 @@ def getTokenInfoRoburna(tokenAddress, tokenId, chat_id):
     '''
     # get the network from db
     network = DB['group'].find_one({"_id": chat_id})['network']
-    print(tokenId)
     # get the network config
     networkConfig = NetworkConfig(network)
 
@@ -93,7 +92,6 @@ def getTokenInfoRoburna(tokenAddress, tokenId, chat_id):
         )
         # https://rbascan.com/api/v2/tokens/0xE6688739A8E6e4bbF4343E2FA6939A8C9dE001b5/instances/1
         response = response.json()
-        print(response)
         # get maxsupply from nft abi
         maxSupply = getMaxSupplyRoburna(tokenAddress, tokenId, chat_id)
         return {

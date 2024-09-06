@@ -76,7 +76,6 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
             try:
                 print(i)
                 tokenId = reversed_response[i]['topics'][3]
-                print(tokenId)
                 # get the token info
                 if network == "roburna_mainnet":
                     tokenInfo = getTokenInfoRoburna (contractId, int(tokenId,16), chat_id)
@@ -100,7 +99,7 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
                     continue
 
             maxSupply = tokenInfo['maxSupply']
-            totalSupply = tokenInfo['totalSupply']
+            totalSupply = int(tokenInfo['totalSupply'])
             name = tokenInfo['name']
 
             # Create the "Mint here!"
@@ -108,8 +107,8 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
                 text="Mint here!", callback_data="mint", url=url)
             markup = types.InlineKeyboardMarkup()
             markup.add(button)
-
             # Create the formatted message
+            print("token id",tokenId)
             if maxSupply == "Infinity":
                 if network == "roburna_mainnet":
                     caption = formattedPost(

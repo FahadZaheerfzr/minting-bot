@@ -44,7 +44,6 @@ while True:
                 continue
         
         # Call the listener function
-        print(lastTokenID)
         lastTokenID = listener(mint_bot, chat_id, url, contractId, methodId, lastTokenID)
         
         
