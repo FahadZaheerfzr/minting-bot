@@ -42,8 +42,12 @@ def listener(bot, chat_id, url, contractId, methodId, lastTokenID):
             return (lastTokenID)
 
         # sort the response
+        print(response)
         if network == "roburna_mainnet":
+            print(response['items'][0]['topics'][3])
             originalLength = len (response['items'])
+            if response['items'][0]['topics'][3] is None:
+                return (lastTokenID)
             latestTokenId = int(response['items'][0]['topics'][3],16)
             from_address = response['items'][0]['topics'][2]
             from_address = from_address.replace("000000000000000000000000","")  
